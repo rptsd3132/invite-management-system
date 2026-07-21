@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # 1. Database Layer (PostgreSQL)
+  db:
+    image: postgres:16-alpine
+    container_name: invite_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: invite_system
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - invite_network
+
+  # 2. Message Broker Layer (Redis for Celery)
+  redis:
+    image: redis:7-alpine
+    container_name: invite_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - invite_network
+
+  # 3. Backend API Layer (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: invite_backend
+    restart: unless-stopped
+    # Uvicorn runs the ASGI server; --reload watches for code changes
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app  # Maps your local backend folder to the container
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_SERVER: db       # Uses the Docker service name instead of localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: invite_system
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    networks:
+      - invite_network
+
+  # 4. Background Task Layer (Celery Worker)
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: invite_celery_worker
+    restart: unless-stopped
+    command: celery -A app.core.celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_SERVER: db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: invite_system
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+      - backend
+    networks:
+      - invite_network
+
+  # 5. Frontend UI Layer (React / Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: invite_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules  # Anonymous volume prevents local node_modules from overwriting container modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - invite_network
+
+# Define persistent storage
+volumes:
+  postgres_data:
+
+# Define isolated internal network
+networks:
+  invite_network:
+    driver: bridge

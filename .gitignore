@@ -1,0 +1,47 @@
+
+# Invite Management System 
+
+
+# 1. Environment Variables & Secrets (Applies to both Frontend & Backend)
+.env
+.env.*
+!.env.example
+*.pem
+
+# 2. Node.js & React Frontend
+node_modules/
+dist/
+build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+
+# 3. Python & FastAPI Backend
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+*.sqlite3
+
+# 4. Docker (Ignore local override configurations if you use them later)
+docker-compose.override.yml
+.docker/
+
+# 5. OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 6. IDEs and Editor Configuration
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,47 @@
+
+# Python & FastAPI Backend
+
+
+# 1. Environment Variables & Secrets
+# NEVER commit the .env file. It contains database credentials and secret keys.
+.env
+.env.*
+*.pem
+
+# 2. Virtual Environments
+# Dependencies should be installed via requirements.txt, not tracked in Git.
+venv/
+.venv/
+env/
+ENV/
+
+# 3. Byte-compiled / Optimized / DLL files
+# Python compiles source code to byte code on the fly. These are unnecessary.
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 4. Logs and Databases
+# Prevents committing local logs or local SQLite fallbacks (if ever used).
+*.log
+logs/
+*.sqlite3
+*.db
+
+# 5. IDEs and Editor Configuration
+# Prevents sharing your personal editor settings with other developers.
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 6. OS Generated Files
+# System-specific indexing and thumbnail caches.
+.DS_Store
+Thumbs.db
+
+# 7. Testing & Coverage (Standard inclusions for when you add tests)
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
