@@ -6,19 +6,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.v1.endpoints.templates import router as templates_router
 from app.api.v1.endpoints.health import router as health_router
-from app.core.database import Base, engine
+from app.core.database import Base, engine, async_session_factory
 
 # Ensure the model metadata is loaded before creating tables.
 from app.models import Template, User  # noqa: F401
-
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    async with async_session_factory() as session:
+        from app.db.seed_templates import seed_templates
+        await seed_templates(session)
     yield
     await engine.dispose()
-
 
 app = FastAPI(
     title="Invite Management System API",
@@ -26,9 +27,9 @@ app = FastAPI(
     description="Backend API for the invite management platform",
     lifespan=lifespan,
 )
-
 origins = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(

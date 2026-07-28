@@ -1,9 +1,23 @@
+export interface DesignTypography {
+  title_classes: string;
+  accent_classes: string;
+  body_classes: string;
+}
+
+export interface DesignSchema {
+  container_classes: string;
+  background: string;
+  decorations: string[];
+  typography: DesignTypography;
+  required_fields: string[];
+}
+
 export interface Template {
   id: string;
   name: string;
   category: string;
   thumbnail_url: string | null;
-  design_schema: Record<string, unknown>;
+  design_schema: DesignSchema;
   created_at: string;
 }
 
