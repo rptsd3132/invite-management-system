@@ -38,3 +38,43 @@ export interface AuthTokens {
 export interface GoogleAuthResponse extends AuthTokens {
   user: User;
 }
+
+export interface CreateEventPayload {
+  template_id: string;
+  event_name: string;
+  location: string;
+  event_date: string;
+  event_metadata?: Record<string, string>;
+}
+
+export interface EventResponse {
+  id: string;
+  user_id: string;
+  template_id: string;
+  event_name: string;
+  location: string;
+  event_date: string;
+  event_metadata: Record<string, string>;
+  created_at: string;
+}
+
+export interface ParticipantResponse {
+  id: string;
+  event_id: string;
+  guest_name: string;
+  email: string | null;
+  unique_link_token: string;
+  rsvp_status: string;
+  created_at: string;
+}
+
+export interface EventDetailResponse extends EventResponse {
+  participants: ParticipantResponse[];
+}
+
+export interface InvitationResponse {
+  event: EventResponse;
+  participant: ParticipantResponse;
+  template: Template;
+  field_data: Record<string, string>;
+}

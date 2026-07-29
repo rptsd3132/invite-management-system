@@ -1,5 +1,13 @@
 import axios from "axios";
-import type { GoogleAuthResponse, Template } from "../types";
+import type {
+  CreateEventPayload,
+  EventDetailResponse,
+  EventResponse,
+  GoogleAuthResponse,
+  InvitationResponse,
+  ParticipantResponse,
+  Template,
+} from "../types";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
@@ -11,7 +19,7 @@ api.interceptors.request.use((config) => {
   if (stored) {
     try {
       const parsed = JSON.parse(stored);
-      const token = parsed?.state?.access_token;
+      const token = parsed?.state?.access_token ?? parsed?.access_token;
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -56,6 +64,39 @@ export async function registerWithEmailApi(payload: {
   password: string;
 }): Promise<GoogleAuthResponse> {
   const { data } = await api.post<GoogleAuthResponse>("/api/auth/register", payload);
+  return data;
+}
+
+export async function createEvent(payload: CreateEventPayload): Promise<EventResponse> {
+  const { data } = await api.post<EventResponse>("/api/v1/events/", payload);
+  return data;
+}
+
+export async function getEvents(): Promise<EventResponse[]> {
+  const { data } = await api.get<EventResponse[]>("/api/v1/events");
+  return data;
+}
+
+export async function getEvent(eventId: string): Promise<EventDetailResponse> {
+  const { data } = await api.get<EventDetailResponse>(`/api/v1/events/${eventId}`);
+  return data;
+}
+
+export async function addParticipants(
+  eventId: string,
+  participants: { guest_name: string; email?: string }[],
+): Promise<ParticipantResponse[]> {
+  const { data } = await api.post<ParticipantResponse[]>(
+    `/api/v1/events/${eventId}/participants`,
+    { participants },
+  );
+  return data;
+}
+
+export async function getInvitationByToken(
+  token: string,
+): Promise<InvitationResponse> {
+  const { data } = await api.get<InvitationResponse>(`/api/v1/invitation/${token}`);
   return data;
 }
 

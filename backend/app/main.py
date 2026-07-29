@@ -6,10 +6,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.v1.endpoints.templates import router as templates_router
 from app.api.v1.endpoints.health import router as health_router
+from app.api.v1.endpoints.events import router as events_router
+from app.api.v1.endpoints.invitation import router as invitation_router
 from app.core.database import Base, engine, async_session_factory
 
 # Ensure the model metadata is loaded before creating tables.
-from app.models import Template, User  # noqa: F401
+from app.models import Template, User, Event, Participant  # noqa: F401
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
@@ -43,3 +45,5 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(templates_router)
+app.include_router(events_router)
+app.include_router(invitation_router)
