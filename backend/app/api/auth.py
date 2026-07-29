@@ -3,7 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_db
 from app.core.security import create_access_token, create_refresh_token
-from app.schemas.auth import AuthResponse, EmailPasswordPayload, GoogleAuthPayload, UserResponse
+from app.schemas.auth import (
+    AuthResponse,
+    GoogleAuthPayload,
+    UserLoginRequest,
+    UserRegisterRequest,
+    UserResponse,
+)
 from app.services.auth_service import (
     authenticate_local_user,
     authenticate_or_create_google_user,
@@ -24,6 +30,9 @@ def _build_auth_response(user) -> AuthResponse:
         refresh_token=refresh_token,
         user=UserResponse(
             id=str(user.id),
+            first_name=user.first_name,
+            last_name=user.last_name,
+            username=user.username,
             email=user.email,
             role=user.role,
             is_active=user.is_active,
@@ -46,6 +55,8 @@ async def google_auth(
                 detail="Invalid Google access token",
             )
         email = user_info.get("email")
+        first_name = user_info.get("given_name")
+        last_name = user_info.get("family_name")
     elif payload.google_token:
         try:
             id_info = verify_google_id_token(payload.google_token)
@@ -55,6 +66,8 @@ async def google_auth(
                 detail="Invalid Google token",
             )
         email = id_info.get("email")
+        first_name = id_info.get("given_name")
+        last_name = id_info.get("family_name")
     else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -67,21 +80,36 @@ async def google_auth(
             detail="Google token missing email",
         )
 
-    user = await authenticate_or_create_google_user(db, email)
+    user = await authenticate_or_create_google_user(
+        db, email, first_name=first_name, last_name=last_name
+    )
     return _build_auth_response(user)
 
 
 @router.post("/register", response_model=AuthResponse)
 async def register(
-    payload: EmailPasswordPayload,
+    payload: UserRegisterRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
     try:
-        user = await register_local_user(db, payload.email, payload.password)
-    except ValueError:
+        user = await register_local_user(
+            db,
+            first_name=payload.first_name,
+            last_name=payload.last_name,
+            username=payload.username,
+            email=payload.email,
+            password=payload.password,
+        )
+    except ValueError as e:
+        detail = str(e)
+        if "Email" in detail:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Email already registered",
+            )
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Email already registered",
+            detail="Username already taken",
         )
 
     return _build_auth_response(user)
@@ -89,15 +117,17 @@ async def register(
 
 @router.post("/login", response_model=AuthResponse)
 async def login(
-    payload: EmailPasswordPayload,
+    payload: UserLoginRequest,
     db: AsyncSession = Depends(get_db),
 ) -> AuthResponse:
     try:
-        user = await authenticate_local_user(db, payload.email, payload.password)
+        user = await authenticate_local_user(
+            db, payload.identifier, payload.password
+        )
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Invalid credentials",
         )
 
     return _build_auth_response(user)

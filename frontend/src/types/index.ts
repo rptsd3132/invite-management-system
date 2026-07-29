@@ -23,6 +23,9 @@ export interface Template {
 
 export interface User {
   id: string;
+  first_name: string | null;
+  last_name: string | null;
+  username: string | null;
   email: string;
   role: "admin" | "organizer";
   is_active: boolean;
@@ -35,7 +38,7 @@ export interface AuthTokens {
   token_type: string;
 }
 
-export interface GoogleAuthResponse extends AuthTokens {
+export interface AuthResponse extends AuthTokens {
   user: User;
 }
 

@@ -1,9 +1,9 @@
 import axios from "axios";
 import type {
+  AuthResponse,
   CreateEventPayload,
   EventDetailResponse,
   EventResponse,
-  GoogleAuthResponse,
   InvitationResponse,
   ParticipantResponse,
   Template,
@@ -35,8 +35,10 @@ export async function getTemplates(): Promise<Template[]> {
   return data;
 }
 
-export async function loginWithGoogleApi(googleToken: string): Promise<GoogleAuthResponse> {
-  const { data } = await api.post<GoogleAuthResponse>("/api/auth/google", {
+export async function loginWithGoogleApi(
+  googleToken: string,
+): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/api/auth/google", {
     google_token: googleToken,
   });
   return data;
@@ -44,30 +46,35 @@ export async function loginWithGoogleApi(googleToken: string): Promise<GoogleAut
 
 export async function loginWithGoogleAccessToken(
   accessToken: string,
-): Promise<GoogleAuthResponse> {
-  const { data } = await api.post<GoogleAuthResponse>("/api/auth/google", {
+): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/api/auth/google", {
     google_access_token: accessToken,
   });
   return data;
 }
 
 export async function loginWithEmailApi(payload: {
-  email: string;
+  identifier: string;
   password: string;
-}): Promise<GoogleAuthResponse> {
-  const { data } = await api.post<GoogleAuthResponse>("/api/auth/login", payload);
+}): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/api/auth/login", payload);
   return data;
 }
 
-export async function registerWithEmailApi(payload: {
+export async function registerUserApi(payload: {
+  first_name: string;
+  last_name: string;
+  username: string;
   email: string;
   password: string;
-}): Promise<GoogleAuthResponse> {
-  const { data } = await api.post<GoogleAuthResponse>("/api/auth/register", payload);
+}): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/api/auth/register", payload);
   return data;
 }
 
-export async function createEvent(payload: CreateEventPayload): Promise<EventResponse> {
+export async function createEvent(
+  payload: CreateEventPayload,
+): Promise<EventResponse> {
   const { data } = await api.post<EventResponse>("/api/v1/events/", payload);
   return data;
 }
@@ -77,8 +84,12 @@ export async function getEvents(): Promise<EventResponse[]> {
   return data;
 }
 
-export async function getEvent(eventId: string): Promise<EventDetailResponse> {
-  const { data } = await api.get<EventDetailResponse>(`/api/v1/events/${eventId}`);
+export async function getEvent(
+  eventId: string,
+): Promise<EventDetailResponse> {
+  const { data } = await api.get<EventDetailResponse>(
+    `/api/v1/events/${eventId}`,
+  );
   return data;
 }
 
@@ -96,7 +107,9 @@ export async function addParticipants(
 export async function getInvitationByToken(
   token: string,
 ): Promise<InvitationResponse> {
-  const { data } = await api.get<InvitationResponse>(`/api/v1/invitation/${token}`);
+  const { data } = await api.get<InvitationResponse>(
+    `/api/v1/invitation/${token}`,
+  );
   return data;
 }
 
