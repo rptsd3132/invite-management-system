@@ -4,6 +4,10 @@ import { Layout } from "./components/Layout";
 import { Dashboard } from "./pages/Dashboard";
 import { Templates } from "./pages/Templates";
 import { TemplateDetail } from "./pages/TemplateDetail";
+import { CreateEvent } from "./pages/CreateEvent";
+import { CreateEventWizard } from "./pages/events/CreateEventWizard";
+import { EventDetail } from "./pages/EventDetail";
+import { InvitationPage } from "./pages/InvitationPage";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 
@@ -26,9 +30,13 @@ function App(): React.ReactElement {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/templates/:id" element={<TemplateDetail />} />
+            <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/events/create" element={<CreateEventWizard />} />
+            <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
           </Route>
+          <Route path="/invitation/:token" element={<InvitationPage />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

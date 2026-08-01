@@ -2,20 +2,13 @@ import { useEffect, type ReactElement } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z, type infer as zInfer } from "zod";
 import { useGoogleLogin } from "@react-oauth/google";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "../../lib/utils";
 import { loginWithEmailApi, loginWithGoogleAccessToken } from "../../lib/api";
 import { useAuthStore } from "../../store/authStore";
-
-const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type FormValues = zInfer<typeof formSchema>;
+import { signInSchema, type SignInFormData } from "../../lib/validators";
 
 export function SignInModal({
   isOpen,
@@ -31,8 +24,8 @@ export function SignInModal({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  } = useForm<SignInFormData>({
+    resolver: zodResolver(signInSchema),
   });
 
   const googleMutation = useMutation({
@@ -51,13 +44,14 @@ export function SignInModal({
 
   const emailMutation = useMutation({
     mutationFn: loginWithEmailApi,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      login(data.user, data);
       onClose();
     },
   });
 
-  const onSubmit = (data: FormValues): void => {
-    emailMutation.mutate({ email: data.email, password: data.password });
+  const onSubmit = (data: SignInFormData): void => {
+    emailMutation.mutate(data);
   };
 
   useEffect(() => {
@@ -108,18 +102,11 @@ export function SignInModal({
           <button
             type="button"
             onClick={() => googleLogin()}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+            disabled={googleMutation.isPending}
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50"
           >
             <GoogleIcon />
-            Continue with Google
-          </button>
-
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
-          >
-            <AppleIcon />
-            Continue with Apple
+            {googleMutation.isPending ? "Connecting..." : "Continue with Google"}
           </button>
         </div>
 
@@ -145,16 +132,18 @@ export function SignInModal({
         <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
           <div>
             <input
-              {...register("email")}
-              type="email"
-              placeholder="Email address"
+              {...register("identifier")}
+              type="text"
+              placeholder="Email or username"
               className={cn(
                 "w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:outline-none focus:ring-0",
-                errors.email && "border-red-500",
+                errors.identifier && "border-red-500",
               )}
             />
-            {errors.email && (
-              <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+            {errors.identifier && (
+              <p className="mt-1 text-xs text-red-500">
+                {errors.identifier.message}
+              </p>
             )}
           </div>
           <div>
@@ -168,7 +157,9 @@ export function SignInModal({
               )}
             />
             {errors.password && (
-              <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+              <p className="mt-1 text-xs text-red-500">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
@@ -182,12 +173,6 @@ export function SignInModal({
         </form>
 
         <div className="mt-6 space-y-3 text-center">
-          <button
-            type="button"
-            className="text-sm font-medium text-[#4a5d23] transition-colors hover:underline"
-          >
-            Forgot password?
-          </button>
           <p className="text-sm text-neutral-600">
             Don't have an account?{" "}
             <button
@@ -226,14 +211,6 @@ function GoogleIcon(): ReactElement {
         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         fill="#EA4335"
       />
-    </svg>
-  );
-}
-
-function AppleIcon(): ReactElement {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true" fill="currentColor">
-      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
     </svg>
   );
 }

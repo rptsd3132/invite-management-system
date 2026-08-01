@@ -146,7 +146,7 @@ export function Dashboard(): React.ReactElement {
               variant="outline"
               size="lg"
               className="rounded-full"
-              onClick={() => navigate("/create-event")}
+              onClick={() => navigate("/events/create")}
             >
               Create an Event
               <ArrowRight className="h-4 w-4" />

@@ -140,7 +140,7 @@ export function TemplateDetail(): React.ReactElement {
 
           <div className="flex gap-3">
             <Button
-              onClick={() => navigate("/create-event")}
+              onClick={() => navigate("/create-event", { state: { templateId: id } })}
               className="flex-1"
             >
               Use This Template
