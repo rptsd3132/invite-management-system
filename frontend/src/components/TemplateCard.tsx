@@ -3,7 +3,7 @@ import { Card } from "./ui/Card";
 
 const PASTEL_VARIANTS = ["peach", "blush", "sky", "lilac", "mint", "cream"] as const;
 type PastelVariant = (typeof PASTEL_VARIANTS)[number];
-
+          
 interface TemplateCardProps {
   category: string;
   thumbnailUrl: string | null;
