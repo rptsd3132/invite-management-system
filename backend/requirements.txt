@@ -46,6 +46,7 @@ python-dotenv==1.2.2
 python-multipart==0.0.32
 PyYAML==6.0.3
 redis==8.0.1
+requests==2.32.3
 rich==15.0.0
 rich-toolkit==0.20.3
 rignore==0.8.0
@@ -66,3 +67,7 @@ vine==5.1.0
 watchfiles==1.2.0
 wcwidth==0.8.2
 websockets==16.1.1
+google-auth==2.38.0
+pytest==8.3.4
+pytest-asyncio==0.25.3
+pytest-mock==3.14.0
