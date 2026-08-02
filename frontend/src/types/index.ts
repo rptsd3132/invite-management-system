@@ -23,13 +23,13 @@ export interface Template {
 
 export interface User {
   id: string;
-  first_name: string | null;
-  last_name: string | null;
-  username: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  username?: string | null;
   email: string;
-  role: "admin" | "organizer";
+  role: string;
   is_active: boolean;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface AuthTokens {
@@ -41,7 +41,6 @@ export interface AuthTokens {
 export interface AuthResponse extends AuthTokens {
   user: User;
 }
-
 export interface CreateEventPayload {
   template_id: string;
   event_name: string;

@@ -10,23 +10,37 @@ import type {
 } from "../types";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
-  headers: { "Content-Type": "application/json" },
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {
-  const stored = localStorage.getItem("auth-storage");
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      const token = parsed?.state?.access_token ?? parsed?.access_token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+  let accessToken: string | null = localStorage.getItem("token");
+
+  if (!accessToken) {
+    const authStorage = localStorage.getItem("auth-storage");
+
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+
+        accessToken =
+          parsed?.state?.access_token ??
+          parsed?.access_token ??
+          null;
+      } catch {
+        accessToken = null;
       }
-    } catch {
-      // ignore parse errors
     }
   }
+
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   return config;
 });
 
@@ -38,18 +52,26 @@ export async function getTemplates(): Promise<Template[]> {
 export async function loginWithGoogleApi(
   googleToken: string,
 ): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/api/auth/google", {
-    google_token: googleToken,
-  });
+  const { data } = await api.post<AuthResponse>(
+    "/api/auth/google",
+    {
+      google_token: googleToken,
+    },
+  );
+
   return data;
 }
 
 export async function loginWithGoogleAccessToken(
   accessToken: string,
 ): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/api/auth/google", {
-    google_access_token: accessToken,
-  });
+  const { data } = await api.post<AuthResponse>(
+    "/api/auth/google",
+    {
+      google_access_token: accessToken,
+    },
+  );
+
   return data;
 }
 
@@ -57,7 +79,11 @@ export async function loginWithEmailApi(payload: {
   identifier: string;
   password: string;
 }): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/api/auth/login", payload);
+  const { data } = await api.post<AuthResponse>(
+    "/api/auth/login",
+    payload,
+  );
+
   return data;
 }
 
@@ -68,19 +94,30 @@ export async function registerUserApi(payload: {
   email: string;
   password: string;
 }): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/api/auth/register", payload);
+  const { data } = await api.post<AuthResponse>(
+    "/api/auth/register",
+    payload,
+  );
+
   return data;
 }
 
 export async function createEvent(
   payload: CreateEventPayload,
 ): Promise<EventResponse> {
-  const { data } = await api.post<EventResponse>("/api/v1/events/", payload);
+  const { data } = await api.post<EventResponse>(
+    "/api/v1/events",
+    payload,
+  );
+
   return data;
 }
 
 export async function getEvents(): Promise<EventResponse[]> {
-  const { data } = await api.get<EventResponse[]>("/api/v1/events");
+  const { data } = await api.get<EventResponse[]>(
+    "/api/v1/events",
+  );
+
   return data;
 }
 
@@ -90,17 +127,22 @@ export async function getEvent(
   const { data } = await api.get<EventDetailResponse>(
     `/api/v1/events/${eventId}`,
   );
+
   return data;
 }
 
 export async function addParticipants(
   eventId: string,
-  participants: { guest_name: string; email?: string }[],
+  participants: {
+    guest_name: string;
+    email?: string;
+  }[],
 ): Promise<ParticipantResponse[]> {
   const { data } = await api.post<ParticipantResponse[]>(
     `/api/v1/events/${eventId}/participants`,
     { participants },
   );
+
   return data;
 }
 
@@ -110,6 +152,7 @@ export async function getInvitationByToken(
   const { data } = await api.get<InvitationResponse>(
     `/api/v1/invitation/${token}`,
   );
+
   return data;
 }
 
