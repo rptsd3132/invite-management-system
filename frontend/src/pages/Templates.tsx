@@ -7,6 +7,24 @@ import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
 
+const DEFAULT_TYPOGRAPHY = {
+  title_classes:
+    "font-serif text-[clamp(1.5rem,5vw,2.5rem)] font-semibold text-white",
+  accent_classes:
+    "font-serif text-[clamp(1rem,3.5vw,1.5rem)] italic text-white/90",
+  body_classes:
+    "text-[clamp(0.7rem,2vw,0.875rem)] uppercase tracking-[0.18em] text-white/80",
+};
+
+const DEFAULT_DESIGN_SCHEMA = {
+  container_classes:
+    "relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl shadow-xl",
+  background: "bg-gradient-to-br from-slate-700 to-slate-950",
+  decorations: [] as string[],
+  typography: DEFAULT_TYPOGRAPHY,
+  required_fields: [] as string[],
+};
+
 const categoryColors: Record<string, string> = {
   Wedding: "bg-pink-100 text-pink-700 border-pink-200",
   Office: "bg-blue-100 text-blue-700 border-blue-200",
@@ -15,40 +33,87 @@ const categoryColors: Record<string, string> = {
 
 function TemplatePreview({ template }: { template: Template }) {
   const navigate = useNavigate();
-  const colorClass = categoryColors[template.category] ?? "bg-neutral-100 text-neutral-700 border-neutral-200";
+
+  const colorClass =
+    categoryColors[template.category] ??
+    "bg-neutral-100 text-neutral-700 border-neutral-200";
+
+  const rawSchema = template.design_schema ?? {};
+
+  const designSchema = {
+    ...DEFAULT_DESIGN_SCHEMA,
+    ...rawSchema,
+
+    decorations: Array.isArray(rawSchema.decorations)
+      ? rawSchema.decorations
+      : [],
+
+    required_fields: Array.isArray(rawSchema.required_fields)
+      ? rawSchema.required_fields
+      : [],
+
+    typography: {
+      ...DEFAULT_TYPOGRAPHY,
+      ...(rawSchema.typography ?? {}),
+    },
+  };
 
   return (
     <button
       type="button"
       onClick={() => navigate(`/templates/${template.id}`)}
-      className="group text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 rounded-xl"
+      className="group rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
     >
-      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
         <div className="p-3">
           <div
             className={cn(
-              "rounded-lg overflow-hidden",
-              template.design_schema.container_classes,
-              template.design_schema.background,
+              "relative isolate overflow-hidden rounded-lg",
+              designSchema.container_classes,
+              designSchema.background,
             )}
-            style={{ maxWidth: "100%", aspectRatio: "3/4" }}
+            style={{
+              maxWidth: "100%",
+              aspectRatio: "3/4",
+            }}
           >
-            <div className="flex flex-col items-center justify-center h-full p-4 text-center">
-              <span className={cn(
-                template.design_schema.typography.title_classes,
-                "text-base truncate max-w-full",
-              )}>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/35" />
+
+            <div className="pointer-events-none absolute inset-3 rounded-md border border-white/40" />
+
+            <div className="relative z-10 flex h-full flex-col items-center justify-center p-4 text-center">
+              <span
+                className={cn(
+                  designSchema.typography.title_classes,
+                  "max-w-full truncate text-base",
+                )}
+              >
                 {template.name}
               </span>
-              <div className={cn(template.design_schema.typography.accent_classes, "text-xs mt-1")}>
+
+              <div
+                className={cn(
+                  designSchema.typography.accent_classes,
+                  "mt-1 text-xs",
+                )}
+              >
                 Preview
               </div>
             </div>
           </div>
         </div>
-        <div className="pb-3 px-3 flex items-center justify-between">
-          <span className="font-medium text-sm text-neutral-800">{template.name}</span>
-          <span className={cn("text-xs px-2 py-0.5 rounded-full border", colorClass)}>
+
+        <div className="flex items-center justify-between gap-2 px-3 pb-3">
+          <span className="truncate text-sm font-medium text-neutral-800">
+            {template.name}
+          </span>
+
+          <span
+            className={cn(
+              "shrink-0 rounded-full border px-2 py-0.5 text-xs",
+              colorClass,
+            )}
+          >
             {template.category}
           </span>
         </div>
@@ -56,6 +121,8 @@ function TemplatePreview({ template }: { template: Template }) {
     </button>
   );
 }
+
+
 
 export function Templates(): React.ReactElement {
   const navigate = useNavigate();

@@ -5,258 +5,205 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.template import Template
 
+
 TEMPLATES_DATA = [
-    # ── WEDDING (4) ──────────────────────────────────────────────────────
     {
         "name": "Arch Botanical",
         "category": "Wedding",
+        "thumbnail_url": "wedding/arch-botanical.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-b from-emerald-50 via-green-50 to-stone-50",
-            "decorations": [
-                "leaf-top-right",
-                "leaf-bottom-left",
-                "gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-serif text-3xl text-emerald-800 mb-1 z-10",
-                "accent_classes": "font-serif italic text-lg text-emerald-600 my-1 z-10",
-                "body_classes": "font-sans text-xs text-stone-500 uppercase tracking-[0.2em] z-10",
-            },
+            "background_image": "wedding/arch-botanical.jpg",
+            "background_position": "center",
+            "style_key": "wedding-botanical",
+            "category": "Wedding",
+            "badge_text": "Wedding invitation",
+            "eyebrow_text": "Together with their families",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "bride_name", "groom_name",
+                "event_name", "bride_name", "groom_name",
+                "event_date_time", "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Minimalist Typography",
         "category": "Wedding",
+        "thumbnail_url": "wedding/minimalist.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-xl flex flex-col items-center text-center overflow-hidden bg-white",
-            "background": "bg-white",
-            "decorations": [
-                "gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-4xl text-stone-800 font-light tracking-tight z-10",
-                "accent_classes": "font-sans text-xs text-stone-400 uppercase tracking-[0.35em] my-1 z-10",
-                "body_classes": "font-sans text-sm text-stone-600 leading-relaxed z-10",
-            },
+            "background_image": "wedding/minimalist.jpg",
+            "background_position": "center",
+            "style_key": "wedding-minimal",
+            "category": "Wedding",
+            "badge_text": "Save the date",
+            "eyebrow_text": "We request the pleasure of your company",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "bride_name", "groom_name",
+                "event_name", "bride_name", "groom_name",
+                "event_date_time", "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Elegant Gold & Navy",
         "category": "Wedding",
+        "thumbnail_url": "wedding/elegant-gold-navy.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900",
-            "decorations": [
-                "gold-frame",
-                "inner-gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-serif text-4xl text-amber-300 mb-1 tracking-wide z-10",
-                "accent_classes": "font-sans text-xs text-amber-400/80 uppercase tracking-[0.3em] my-1 z-10",
-                "body_classes": "font-sans text-sm text-slate-300 z-10",
-            },
+            "background_image": "wedding/elegant-gold-navy.jpg",
+            "background_position": "center",
+            "style_key": "wedding-luxury",
+            "category": "Wedding",
+            "badge_text": "A celebration of love",
+            "eyebrow_text": "You are cordially invited",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "bride_name", "groom_name",
+                "event_name", "bride_name", "groom_name",
+                "event_date_time", "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Whimsical Pastel",
         "category": "Wedding",
+        "thumbnail_url": "wedding/whimsical-pastel.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-tr from-pink-100 via-purple-50 to-sky-100",
-            "decorations": [
-                "pink-flower-top-left",
-                "purple-flower-bottom-right",
-                "top-pink-circle",
-            ],
-            "typography": {
-                "title_classes": "font-serif text-3xl text-purple-700 mb-1 z-10",
-                "accent_classes": "font-serif italic text-lg text-pink-500 my-1 z-10",
-                "body_classes": "font-sans text-xs text-stone-500 uppercase tracking-[0.15em] z-10",
-            },
+            "background_image": "wedding/whimsical-pastel.jpg",
+            "background_position": "center",
+            "style_key": "wedding-pastel",
+            "category": "Wedding",
+            "badge_text": "Our special day",
+            "eyebrow_text": "Join us as we begin forever",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "bride_name", "groom_name",
+                "event_name", "bride_name", "groom_name",
+                "event_date_time", "event_location", "participant_name",
             ],
         },
     },
-    # ── OFFICE (4) ───────────────────────────────────────────────────────
     {
         "name": "Corporate Sleek",
         "category": "Office",
+        "thumbnail_url": "office/corporate.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-b from-slate-50 via-blue-50 to-slate-50",
-            "decorations": [
-                "gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-3xl text-slate-800 font-bold tracking-tight z-10",
-                "accent_classes": "font-sans text-xs text-blue-500 uppercase tracking-[0.3em] mb-2 z-10",
-                "body_classes": "font-sans text-sm text-slate-600 z-10",
-            },
+            "background_image": "office/corporate.jpg",
+            "background_position": "center",
+            "style_key": "office-corporate",
+            "category": "Office",
+            "badge_text": "Corporate event",
+            "eyebrow_text": "Official invitation",
             "required_fields": [
-                "event_name", "event_location", "event_date_time", "participant_name",
+                "event_name", "participant_name", "event_date_time", "event_location",
             ],
         },
     },
     {
         "name": "Tech Neon & Cyber",
         "category": "Office",
+        "thumbnail_url": "office/tech.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950",
-            "decorations": [
-                "gold-frame",
-                "inner-gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-mono text-3xl text-cyan-300 font-bold tracking-wide z-10",
-                "accent_classes": "font-sans text-xs text-fuchsia-400 uppercase tracking-[0.35em] mb-2 z-10",
-                "body_classes": "font-sans text-sm text-slate-300 z-10",
-            },
+            "background_image": "office/tech.jpg",
+            "background_position": "center",
+            "style_key": "office-tech",
+            "category": "Office",
+            "badge_text": "Technology event",
+            "eyebrow_text": "Innovation starts here",
             "required_fields": [
-                "event_name", "event_location", "event_date_time", "participant_name",
+                "event_name", "participant_name", "event_date_time", "event_location",
             ],
         },
     },
     {
         "name": "Executive Earth-tones",
         "category": "Office",
+        "thumbnail_url": "office/executive.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-amber-50 via-orange-50 to-stone-50",
-            "decorations": [
-                "gold-frame",
-            ],
-            "typography": {
-                "title_classes": "font-serif text-3xl text-amber-900 font-semibold z-10",
-                "accent_classes": "font-sans text-xs text-stone-500 uppercase tracking-[0.3em] mb-2 z-10",
-                "body_classes": "font-sans text-sm text-stone-600 z-10",
-            },
+            "background_image": "office/executive.jpg",
+            "background_position": "center",
+            "style_key": "office-executive",
+            "category": "Office",
+            "badge_text": "Executive gathering",
+            "eyebrow_text": "Leadership • Vision • Growth",
             "required_fields": [
-                "event_name", "event_location", "event_date_time", "participant_name",
+                "event_name", "participant_name", "event_date_time", "event_location",
             ],
         },
     },
     {
         "name": "Creative Geometric",
         "category": "Office",
+        "thumbnail_url": "office/creative.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-indigo-50 via-violet-50 to-fuchsia-50",
-            "decorations": [
-                "top-pink-circle",
-                "bottom-purple-circle",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-3xl text-indigo-700 font-black tracking-tight z-10",
-                "accent_classes": "font-sans text-xs text-fuchsia-500 uppercase tracking-[0.3em] mb-2 z-10",
-                "body_classes": "font-sans text-sm text-stone-600 z-10",
-            },
+            "background_image": "office/creative.jpg",
+            "background_position": "center",
+            "style_key": "office-creative",
+            "category": "Office",
+            "badge_text": "Creative session",
+            "eyebrow_text": "Connect • Create • Collaborate",
             "required_fields": [
-                "event_name", "event_location", "event_date_time", "participant_name",
+                "event_name", "participant_name", "event_date_time", "event_location",
             ],
         },
     },
-    # ── BIRTHDAY (4) ─────────────────────────────────────────────────────
     {
         "name": "Pop-Art Vibrant",
         "category": "Birthday",
+        "thumbnail_url": "birthday/pop-art.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-yellow-300 via-orange-400 to-red-400",
-            "decorations": [
-                "confetti",
-                "top-pink-circle",
-                "bottom-purple-circle",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-4xl text-white font-black tracking-tight uppercase z-10",
-                "accent_classes": "font-sans text-sm text-yellow-200 uppercase tracking-[0.35em] font-bold z-10",
-                "body_classes": "font-sans text-sm text-white/90 z-10",
-            },
+            "background_image": "birthday/pop-art.jpg",
+            "background_position": "center",
+            "style_key": "birthday-pop",
+            "category": "Birthday",
+            "badge_text": "Birthday celebration",
+            "eyebrow_text": "Let us celebrate",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "birthday_person_name",
+                "event_name", "birthday_person_name", "event_date_time",
+                "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Dark Mode Neon",
         "category": "Birthday",
+        "thumbnail_url": "birthday/dark-neon.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-b from-gray-900 via-zinc-900 to-gray-900",
-            "decorations": [
-                "confetti",
-                "top-pink-circle",
-                "bottom-purple-circle",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-4xl text-pink-400 font-black tracking-tight z-10 drop-shadow-[0_0_12px_rgba(236,72,153,0.3)]",
-                "accent_classes": "font-sans text-sm text-cyan-300 uppercase tracking-[0.35em] z-10 drop-shadow-[0_0_8px_rgba(34,211,238,0.3)]",
-                "body_classes": "font-sans text-sm text-zinc-300 z-10",
-            },
+            "background_image": "birthday/dark-neon.jpg",
+            "background_position": "center",
+            "style_key": "birthday-neon",
+            "category": "Birthday",
+            "badge_text": "Party mode on",
+            "eyebrow_text": "A night to remember",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "birthday_person_name",
+                "event_name", "birthday_person_name", "event_date_time",
+                "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Soft Watercolor",
         "category": "Birthday",
+        "thumbnail_url": "birthday/watercolor.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-br from-sky-100 via-rose-50 to-amber-50",
-            "decorations": [
-                "confetti",
-                "top-pink-circle",
-                "bottom-purple-circle",
-            ],
-            "typography": {
-                "title_classes": "font-serif text-3xl text-rose-500 mb-1 z-10",
-                "accent_classes": "font-sans text-xs text-sky-600 uppercase tracking-[0.3em] mb-2 z-10",
-                "body_classes": "font-sans text-sm text-stone-500 z-10",
-            },
+            "background_image": "birthday/watercolor.jpg",
+            "background_position": "center",
+            "style_key": "birthday-watercolor",
+            "category": "Birthday",
+            "badge_text": "A special birthday",
+            "eyebrow_text": "Please join us to celebrate",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "birthday_person_name",
+                "event_name", "birthday_person_name", "event_date_time",
+                "event_location", "participant_name",
             ],
         },
     },
     {
         "name": "Bold Retro",
         "category": "Birthday",
+        "thumbnail_url": "birthday/retro.jpg",
         "design_schema": {
-            "container_classes": "relative w-full max-w-md mx-auto aspect-[3/4] shadow-2xl flex flex-col items-center text-center overflow-hidden",
-            "background": "bg-gradient-to-b from-orange-200 via-yellow-100 to-orange-100",
-            "decorations": [
-                "confetti",
-                "top-pink-circle",
-                "bottom-purple-circle",
-            ],
-            "typography": {
-                "title_classes": "font-sans text-4xl text-orange-700 font-black tracking-tight uppercase z-10",
-                "accent_classes": "font-sans text-sm text-orange-500 uppercase tracking-[0.3em] font-bold z-10",
-                "body_classes": "font-sans text-sm text-stone-600 z-10",
-            },
+            "background_image": "birthday/retro.jpg",
+            "background_position": "center",
+            "style_key": "birthday-retro",
+            "category": "Birthday",
+            "badge_text": "Good vibes only",
+            "eyebrow_text": "Come party with us",
             "required_fields": [
-                "event_name", "event_location", "event_date_time",
-                "participant_name", "birthday_person_name",
+                "event_name", "birthday_person_name", "event_date_time",
+                "event_location", "participant_name",
             ],
         },
     },
@@ -264,18 +211,29 @@ TEMPLATES_DATA = [
 
 
 async def seed_templates(db: AsyncSession) -> None:
-    result = await db.execute(select(Template).limit(1))
-    if result.scalar_one_or_none() is not None:
-        return
+    """Create missing templates and update existing templates by template name."""
+    result = await db.execute(select(Template))
+    existing_templates = {
+        template.name: template for template in result.scalars().all()
+    }
 
-    for tpl in TEMPLATES_DATA:
-        template = Template(
-            id=uuid.uuid4(),
-            name=tpl["name"],
-            category=tpl["category"],
-            thumbnail_url=None,
-            design_schema=tpl["design_schema"],
+    for template_data in TEMPLATES_DATA:
+        existing = existing_templates.get(template_data["name"])
+
+        if existing is not None:
+            existing.category = template_data["category"]
+            existing.thumbnail_url = template_data["thumbnail_url"]
+            existing.design_schema = template_data["design_schema"]
+            continue
+
+        db.add(
+            Template(
+                id=uuid.uuid4(),
+                name=template_data["name"],
+                category=template_data["category"],
+                thumbnail_url=template_data["thumbnail_url"],
+                design_schema=template_data["design_schema"],
+            )
         )
-        db.add(template)
 
     await db.commit()
