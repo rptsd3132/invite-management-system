@@ -4,6 +4,7 @@ import { EventDetailsStep } from "./EventDetailsStep";
 import { TemplateSelectionStep } from "./TemplateSelectionStep";
 import { GuestListStep } from "./GuestListStep";
 import { ReviewConfirmStep } from "./ReviewConfirmStep";
+import type { InvitationLanguage } from "../../lib/invitationLanguage";
 
 export interface WizardState {
   eventData: {
@@ -11,6 +12,7 @@ export interface WizardState {
     location: string;
     eventDate: string;
     category: string;
+    language: InvitationLanguage;
     metadata: Record<string, string>;
   };
   selectedTemplateId: string | null;
@@ -30,6 +32,7 @@ const initialState: WizardState = {
     location: "",
     eventDate: "",
     category: "Wedding",
+    language: "en",
     metadata: {},
   },
   selectedTemplateId: null,

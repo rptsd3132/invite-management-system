@@ -6,6 +6,7 @@ import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
 import { TemplateCard } from "../../components/TemplateCard";
 
 import type { WizardState } from "./CreateEventWizard";
+import { formatInvitationDate, getInvitationCopy } from "../../lib/invitationLanguage";
 
 interface Props {
   state: WizardState;
@@ -74,20 +75,13 @@ export function TemplateSelectionStep({
           field === "event_date"
         ) {
           data[field] = state.eventData.eventDate
-            ? new Date(state.eventData.eventDate).toLocaleString(
-                "en-US",
-                {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                },
+            ? formatInvitationDate(
+                state.eventData.eventDate,
+                state.eventData.language,
               )
             : undefined;
         } else if (field === "participant_name") {
-          data[field] = "Guest";
+          data[field] = getInvitationCopy(state.eventData.language).guest;
         } else {
           data[field] =
             state.eventData.metadata?.[field] || undefined;
@@ -348,6 +342,7 @@ export function TemplateSelectionStep({
                 <TemplateRenderer
                   designSchema={selectedTemplate.design_schema}
                   fieldData={previewFieldData}
+                  language={state.eventData.language}
                 />
               </div>
 
@@ -357,7 +352,7 @@ export function TemplateSelectionStep({
                 </p>
 
                 <p className="mt-1 text-xs text-neutral-500">
-                  {selectedTemplate.category} Invitation
+                  {selectedTemplate.category} Invitation · {state.eventData.language === "si" ? "සිංහල" : "English"}
                 </p>
               </div>
             </div>

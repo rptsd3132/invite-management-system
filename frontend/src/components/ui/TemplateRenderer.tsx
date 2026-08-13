@@ -8,11 +8,11 @@ import {
 import type {
   CSSProperties,
   ReactElement,
-  ReactNode,
 } from "react";
 
 import { cn } from "../../lib/utils";
 import { resolveTemplateImage } from "../assets/templateImages";
+import type { InvitationLanguage } from "../../lib/invitationLanguage";
 
 import {
   TEMPLATE_STYLES,
@@ -97,6 +97,7 @@ interface DesignSchema {
 interface TemplateRendererProps {
   designSchema: DesignSchema;
   fieldData: Record<string, string | undefined>;
+  language?: InvitationLanguage;
   className?: string;
 }
 
@@ -1067,6 +1068,7 @@ function resolveDisplayedValue(
 
 function makePositionStyle(
   config: PositionedText,
+  language: InvitationLanguage = "en",
 ): CSSProperties {
   const align =
     config.align ??
@@ -1094,8 +1096,9 @@ function makePositionStyle(
       500,
 
     letterSpacing:
-      config.letter_spacing ??
-      "0em",
+      language === "si"
+        ? "0em"
+        : config.letter_spacing ?? "0em",
 
     transform:
       align === "center"
@@ -1119,6 +1122,7 @@ function makePositionStyle(
 function PositionedLayer({
   designSchema,
   fieldData,
+  language,
 }: {
   designSchema: DesignSchema;
 
@@ -1126,6 +1130,8 @@ function PositionedLayer({
     string,
     string | undefined
   >;
+
+  language: InvitationLanguage;
 }): ReactElement {
   const layout =
     designSchema.layout ??
@@ -1192,6 +1198,7 @@ function PositionedLayer({
               style={
                 makePositionStyle(
                   config,
+                  language,
                 )
               }
             >
@@ -1240,6 +1247,7 @@ function PositionedLayer({
             style={
               makePositionStyle(
                 item,
+                language,
               )
             }
           >
@@ -1656,6 +1664,7 @@ function FullOverlay({
 export function TemplateRenderer({
   designSchema,
   fieldData,
+  language = "en",
   className,
 }: TemplateRendererProps): ReactElement {
   const style =
@@ -1685,6 +1694,7 @@ export function TemplateRenderer({
 
   return (
     <div
+      lang={language === "si" ? "si" : "en"}
       className={cn(
         "group",
         "relative",
@@ -1721,6 +1731,10 @@ export function TemplateRenderer({
           designSchema
             .aspect_ratio ??
           "3 / 4",
+        fontFamily:
+          language === "si"
+            ? '"Noto Sans Sinhala", "Noto Sans", system-ui, sans-serif'
+            : undefined,
       }}
     >
       {backgroundImage && (
@@ -1783,6 +1797,9 @@ export function TemplateRenderer({
             }
             fieldData={
               fieldData
+            }
+            language={
+              language
             }
           />
         </>

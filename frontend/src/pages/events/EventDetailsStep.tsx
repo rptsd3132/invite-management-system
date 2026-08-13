@@ -1,5 +1,12 @@
 import { useState } from "react";
+
 import type { WizardState } from "./CreateEventWizard";
+
+import {
+  categoryLabel,
+  getInvitationCopy,
+  type InvitationLanguage,
+} from "../../lib/invitationLanguage";
 
 interface Props {
   state: WizardState;
@@ -7,50 +14,121 @@ interface Props {
   goToStep: (step: number) => void;
 }
 
-const CATEGORY_SPECIFIC_FIELDS: Record<string, Array<{ key: string; label: string }>> = {
-  Wedding: [
-    { key: "bride_name", label: "Bride Name" },
-    { key: "groom_name", label: "Groom Name" },
-  ],
-  Birthday: [
-    { key: "birthday_person_name", label: "Birthday Person Name" },
-  ],
-  Office: [],
-};
+function getCategorySpecificFields(
+  category: string,
+  language: InvitationLanguage,
+): Array<{ key: string; label: string }> {
+  const copy = getInvitationCopy(language);
 
-export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.ReactElement {
+  if (category === "Wedding") {
+    return [
+      { key: "bride_name", label: copy.brideName },
+      { key: "groom_name", label: copy.groomName },
+    ];
+  }
+
+  if (category === "Birthday") {
+    return [
+      {
+        key: "birthday_person_name",
+        label: copy.birthdayPersonName,
+      },
+    ];
+  }
+
+  return [];
+}
+
+export function EventDetailsStep({
+  state,
+  dispatch,
+  goToStep,
+}: Props): React.ReactElement {
   const { eventData } = state;
+  const language = eventData.language;
+  const copy = getInvitationCopy(language);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const extraFields = CATEGORY_SPECIFIC_FIELDS[eventData.category] ?? [];
+  const extraFields = getCategorySpecificFields(
+    eventData.category,
+    language,
+  );
 
-  const updateField = (key: string, value: string): void => {
-    dispatch({ type: "SET_EVENT_DATA", payload: { [key]: value } });
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+  const updateField = (
+    key: string,
+    value: string,
+  ): void => {
+    dispatch({
+      type: "SET_EVENT_DATA",
+      payload: { [key]: value },
+    });
+
+    if (errors[key]) {
+      setErrors((previous) => ({
+        ...previous,
+        [key]: "",
+      }));
+    }
   };
 
-  const updateMetadata = (key: string, value: string): void => {
+  const updateMetadata = (
+    key: string,
+    value: string,
+  ): void => {
     dispatch({
       type: "SET_EVENT_DATA",
       payload: {
-        metadata: { ...eventData.metadata, [key]: value },
+        metadata: {
+          ...eventData.metadata,
+          [key]: value,
+        },
       },
     });
-    if (errors[key]) setErrors((prev) => ({ ...prev, [key]: "" }));
+
+    if (errors[key]) {
+      setErrors((previous) => ({
+        ...previous,
+        [key]: "",
+      }));
+    }
   };
 
   const validate = (): boolean => {
-    const errs: Record<string, string> = {};
-    if (!eventData.eventName.trim()) errs.eventName = "Event name is required";
-    if (!eventData.location.trim()) errs.location = "Location is required";
-    if (!eventData.eventDate.trim()) errs.eventDate = "Date and time is required";
-    for (const f of extraFields) {
-      if (!(eventData.metadata[f.key] ?? "").trim()) {
-        errs[f.key] = `${f.label} is required`;
+    const nextErrors: Record<string, string> = {};
+
+    if (!eventData.eventName.trim()) {
+      nextErrors.eventName =
+        language === "si"
+          ? `${copy.eventName} ${copy.required}`
+          : "Event name is required";
+    }
+
+    if (!eventData.location.trim()) {
+      nextErrors.location =
+        language === "si"
+          ? `${copy.location} ${copy.required}`
+          : "Location is required";
+    }
+
+    if (!eventData.eventDate.trim()) {
+      nextErrors.eventDate =
+        language === "si"
+          ? `${copy.dateTime} ${copy.required}`
+          : "Date and time is required";
+    }
+
+    for (const field of extraFields) {
+      if (!(eventData.metadata[field.key] ?? "").trim()) {
+        nextErrors[field.key] =
+          language === "si"
+            ? `${field.label} ${copy.required}`
+            : `${field.label} is required`;
       }
     }
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleNext = (): void => {
@@ -58,73 +136,182 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
     goToStep(2);
   };
 
-  return (
-    <div>
-      <h2 className="text-2xl font-bold text-neutral-900">Event Details</h2>
-      <p className="mt-1 text-sm text-neutral-500">Tell us about your event.</p>
+  const inputClass =
+    "mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20";
 
-      <div className="mt-8 space-y-5 max-w-xl">
+  return (
+    <div lang={language === "si" ? "si" : "en"}>
+      <h2 className="text-2xl font-bold text-neutral-900">
+        {copy.eventDetails}
+      </h2>
+
+      <p className="mt-1 text-sm text-neutral-500">
+        {copy.eventDetailsHelp}
+      </p>
+
+      <div className="mt-8 max-w-xl space-y-5">
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Event Name</label>
+          <label className="block text-sm font-medium text-neutral-700">
+            {copy.invitationLanguage}
+          </label>
+
+          <div className="mt-2 grid grid-cols-2 gap-3">
+            {(["en", "si"] as InvitationLanguage[]).map(
+              (option) => {
+                const active = language === option;
+
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() =>
+                      updateField("language", option)
+                    }
+                    className={[
+                      "rounded-xl border px-4 py-3 text-sm font-semibold transition",
+                      active
+                        ? "border-brand bg-brand/5 text-brand ring-2 ring-brand/10"
+                        : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300",
+                    ].join(" ")}
+                  >
+                    {option === "en"
+                      ? copy.english
+                      : copy.sinhala}
+                  </button>
+                );
+              },
+            )}
+          </div>
+
+          <p className="mt-2 text-xs leading-5 text-neutral-400">
+            {language === "si"
+              ? "සිංහල ආරාධනයක් සඳහා නම්, ස්ථානය සහ පුද්ගල නාම අවශ්‍ය ආකාරයට සිංහලෙන් ඇතුළත් කරන්න."
+              : "Names and locations are kept exactly as you type them."}
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-neutral-700">
+            {copy.eventName}
+          </label>
+
           <input
             type="text"
             value={eventData.eventName}
-            onChange={(e) => updateField("eventName", e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            placeholder="e.g. Annual Innovation Summit"
+            onChange={(event) =>
+              updateField("eventName", event.target.value)
+            }
+            className={inputClass}
+            placeholder={
+              language === "si"
+                ? "උදා: වාර්ෂික නවෝත්පාදන සමුළුව 2026"
+                : "e.g. Annual Innovation Summit 2026"
+            }
           />
-          {errors.eventName && <p className="mt-1 text-sm text-red-600">{errors.eventName}</p>}
+
+          {errors.eventName && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.eventName}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Location</label>
+          <label className="block text-sm font-medium text-neutral-700">
+            {copy.location}
+          </label>
+
           <input
             type="text"
             value={eventData.location}
-            onChange={(e) => updateField("location", e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-            placeholder="e.g. Convention Center"
+            onChange={(event) =>
+              updateField("location", event.target.value)
+            }
+            className={inputClass}
+            placeholder={
+              language === "si"
+                ? "උදා: ප්‍රධාන සම්මන්ත්‍රණ ශාලාව"
+                : "e.g. Convention Center"
+            }
           />
-          {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
+
+          {errors.location && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.location}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Date & Time</label>
+          <label className="block text-sm font-medium text-neutral-700">
+            {copy.dateTime}
+          </label>
+
           <input
             type="datetime-local"
             value={eventData.eventDate}
-            onChange={(e) => updateField("eventDate", e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            onChange={(event) =>
+              updateField("eventDate", event.target.value)
+            }
+            className={inputClass}
           />
-          {errors.eventDate && <p className="mt-1 text-sm text-red-600">{errors.eventDate}</p>}
+
+          {errors.eventDate && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.eventDate}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700">Category</label>
+          <label className="block text-sm font-medium text-neutral-700">
+            {copy.category}
+          </label>
+
           <select
             value={eventData.category}
-            onChange={(e) => {
-              updateField("category", e.target.value);
-              dispatch({ type: "SET_EVENT_DATA", payload: { metadata: {} } });
+            onChange={(event) => {
+              updateField("category", event.target.value);
+
+              dispatch({
+                type: "SET_EVENT_DATA",
+                payload: { metadata: {} },
+              });
             }}
-            className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+            className={inputClass}
           >
-            <option value="Wedding">Wedding</option>
-            <option value="Office">Office</option>
-            <option value="Birthday">Birthday</option>
+            <option value="Wedding">
+              {categoryLabel("Wedding", language)}
+            </option>
+            <option value="Office">
+              {categoryLabel("Office", language)}
+            </option>
+            <option value="Birthday">
+              {categoryLabel("Birthday", language)}
+            </option>
           </select>
         </div>
 
-        {extraFields.map((f) => (
-          <div key={f.key}>
-            <label className="block text-sm font-medium text-neutral-700">{f.label}</label>
+        {extraFields.map((field) => (
+          <div key={field.key}>
+            <label className="block text-sm font-medium text-neutral-700">
+              {field.label}
+            </label>
+
             <input
               type="text"
-              value={eventData.metadata[f.key] ?? ""}
-              onChange={(e) => updateMetadata(f.key, e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              value={eventData.metadata[field.key] ?? ""}
+              onChange={(event) =>
+                updateMetadata(field.key, event.target.value)
+              }
+              className={inputClass}
             />
-            {errors[f.key] && <p className="mt-1 text-sm text-red-600">{errors[f.key]}</p>}
+
+            {errors[field.key] && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors[field.key]}
+              </p>
+            )}
           </div>
         ))}
 
@@ -132,9 +319,9 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
           <button
             type="button"
             onClick={handleNext}
-            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand/90 transition-colors"
+            className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand/90"
           >
-            Next: Choose Template
+            {copy.nextChooseTemplate}
           </button>
         </div>
       </div>
