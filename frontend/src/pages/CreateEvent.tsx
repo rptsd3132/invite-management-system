@@ -15,34 +15,32 @@ import {
 import { createEvent, getTemplates } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 import { Button } from "../components/ui/Button";
+<<<<<<< HEAD
 import { Input } from "../components/ui/Input";
 import { LocationPicker } from "../components/events/LocationPicker";
 import type { VenueLocation } from "../components/events/LocationPicker";
 import { StudioCanvas } from "../components/events/StudioCanvas";
 import type { CreateEventPayload, Template } from "../types";
+=======
+import { cn } from "../lib/utils";
+import type { Template } from "../types";
+import {
+  fieldLabel,
+  formatInvitationDate,
+  getInvitationCopy,
+  type InvitationLanguage,
+} from "../lib/invitationLanguage";
+>>>>>>> main
 
 const DATE_LABEL_FIELDS = ["event_date_time", "event_date"];
 const LOCATION_FIELDS = ["event_location", "location"];
 const NAME_FIELDS = ["event_name"];
 
-function formatFieldLabel(key: string): string {
-  const labels: Record<string, string> = {
-    event_name: "Event Name",
-    event_location: "Location",
-    location: "Location",
-    event_date_time: "Date & Time",
-    event_date: "Date & Time",
-    participant_name: "Your Name on Invitation",
-    bride_name: "Bride Name",
-    groom_name: "Groom Name",
-    birthday_person_name: "Birthday Person",
-  };
-  return (
-    labels[key] ??
-    key
-      .replace(/_/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+function formatFieldLabel(
+  key: string,
+  language: InvitationLanguage,
+): string {
+  return fieldLabel(key, language);
 }
 
 function fieldIcon(field: string): React.ReactNode {
@@ -86,6 +84,8 @@ export function CreateEvent(): React.ReactElement {
   );
 
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [language, setLanguage] = useState<InvitationLanguage>("en");
+  const copy = getInvitationCopy(language);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [venue, setVenue] = useState<VenueLocation | null>(null);
 
@@ -108,7 +108,10 @@ export function CreateEvent(): React.ReactElement {
     const errs: Record<string, string> = {};
     for (const f of requiredFields) {
       if (!fieldValues[f]?.trim()) {
-        errs[f] = `${formatFieldLabel(f)} is required`;
+        errs[f] =
+          language === "si"
+            ? `${formatFieldLabel(f, language)} ${copy.required}`
+            : `${formatFieldLabel(f, language)} is required`;
       }
     }
     setErrors(errs);
@@ -116,7 +119,31 @@ export function CreateEvent(): React.ReactElement {
   };
 
   const mutation = useMutation({
+<<<<<<< HEAD
     mutationFn: (payload: CreateEventPayload) => createEvent(payload),
+=======
+    mutationFn: () => {
+      const metadata: Record<string, string> = {};
+      for (const f of requiredFields) {
+        if (!NAME_FIELDS.includes(f) && !LOCATION_FIELDS.includes(f) && !DATE_LABEL_FIELDS.includes(f)) {
+          metadata[f] = fieldValues[f] ?? "";
+        }
+      }
+      metadata.language = language;
+
+      return createEvent({
+        template_id: templateId,
+        event_name: fieldValues["event_name"] ?? "",
+        location: fieldValues["event_location"] ?? fieldValues["location"] ?? "",
+        event_date: fieldValues["event_date_time"]
+          ? new Date(fieldValues["event_date_time"]).toISOString()
+          : fieldValues["event_date"]
+            ? new Date(fieldValues["event_date"]).toISOString()
+            : new Date().toISOString(),
+        event_metadata: metadata,
+      });
+    },
+>>>>>>> main
     onSuccess: () => {
       navigate("/dashboard");
     },
@@ -124,11 +151,26 @@ export function CreateEvent(): React.ReactElement {
 
   const fieldData: Record<string, string | undefined> = useMemo(() => {
     const data: Record<string, string | undefined> = {};
-    for (const f of requiredFields) {
-      data[f] = fieldValues[f] || undefined;
+
+    for (const field of requiredFields) {
+      const value = fieldValues[field];
+
+      if (!value) {
+        data[field] = undefined;
+        continue;
+      }
+
+      if (DATE_LABEL_FIELDS.includes(field)) {
+        data[field] = formatInvitationDate(value, language);
+      } else if (field === "participant_name" && value === "Guest") {
+        data[field] = copy.guest;
+      } else {
+        data[field] = value;
+      }
     }
+
     return data;
-  }, [fieldValues, requiredFields]);
+  }, [copy.guest, fieldValues, language, requiredFields]);
 
   const onSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -198,6 +240,7 @@ export function CreateEvent(): React.ReactElement {
         Back
       </Button>
 
+<<<<<<< HEAD
       <div className="mt-6">
         <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">Create Event</h1>
         <p className="mt-1 text-sm text-zinc-500">
@@ -222,6 +265,59 @@ export function CreateEvent(): React.ReactElement {
               {requiredFields.map((field) => (
                 <Input
                   key={field}
+=======
+      <h1 className="mt-6 text-3xl font-bold text-neutral-900">{copy.createEvent}</h1>
+      <p className="mt-1 text-sm text-neutral-500">
+        Fill in the details below. The preview updates live.
+      </p>
+
+      <form onSubmit={onSubmit} className="mt-8" noValidate>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          <div className="order-2 md:order-1 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700">
+                {copy.invitationLanguage}
+              </label>
+
+              <div className="mt-2 grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={cn(
+                    "rounded-xl border px-4 py-3 text-sm font-semibold transition",
+                    language === "en"
+                      ? "border-brand bg-brand/5 text-brand ring-2 ring-brand/10"
+                      : "border-neutral-200 bg-white text-neutral-700",
+                  )}
+                >
+                  English
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setLanguage("si")}
+                  className={cn(
+                    "rounded-xl border px-4 py-3 text-sm font-semibold transition",
+                    language === "si"
+                      ? "border-brand bg-brand/5 text-brand ring-2 ring-brand/10"
+                      : "border-neutral-200 bg-white text-neutral-700",
+                  )}
+                >
+                  සිංහල
+                </button>
+              </div>
+            </div>
+
+            {requiredFields.map((field) => (
+              <div key={field}>
+                <label
+                  htmlFor={`field-${field}`}
+                  className="block text-sm font-medium text-neutral-700"
+                >
+                  {formatFieldLabel(field, language)}
+                </label>
+                <input
+>>>>>>> main
                   id={`field-${field}`}
                   type={inputType(field)}
                   label={formatFieldLabel(field)}
@@ -260,7 +356,7 @@ export function CreateEvent(): React.ReactElement {
                 {mutation.isPending && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                {mutation.isPending ? "Creating..." : "Create Event"}
+                {mutation.isPending ? copy.creating : copy.createEvent}
               </Button>
             </div>
 
@@ -272,6 +368,7 @@ export function CreateEvent(): React.ReactElement {
             )}
           </div>
 
+<<<<<<< HEAD
           {/* Right column — studio preview */}
           <div className="lg:sticky lg:top-24 lg:self-start">
             <div className="mb-3 flex items-baseline justify-between">
@@ -279,6 +376,15 @@ export function CreateEvent(): React.ReactElement {
               <span className="text-xs text-zinc-400">
                 Use the toolbar to zoom
               </span>
+=======
+          <div className="order-1 md:order-2 flex justify-center">
+            <div className="w-full max-w-sm">
+              <TemplateRenderer
+                designSchema={template.design_schema}
+                fieldData={fieldData}
+                language={language}
+              />
+>>>>>>> main
             </div>
             <StudioCanvas>
               <div className="rounded-2xl shadow-2xl shadow-zinc-900/30">
