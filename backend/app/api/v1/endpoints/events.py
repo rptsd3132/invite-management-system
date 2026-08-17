@@ -1,6 +1,8 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_current_user, get_db
@@ -14,19 +16,40 @@ from app.schemas.participant import (
     ParticipantResponse,
 )
 
-router = APIRouter(prefix="/api/v1/events", tags=["events"])
+logger = logging.getLogger(__name__)
+
+router = APIRouter(
+    prefix="/api/v1/events",
+    tags=["events"],
+    redirect_slashes=False,
+)
 
 
-@router.post("", response_model=EventResponse, status_code=201)
+@router.post("/", response_model=EventResponse, status_code=201)
 async def create_new_event(
     event_in: EventCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> EventResponse:
-    return await create_event(db, event_in, current_user.id)
+    try:
+        return await create_event(db, event_in, current_user.id)
+    except IntegrityError as exc:
+        await db.rollback()
+        logger.error("IntegrityError creating event for user %s: %s", current_user.id, exc)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid data for event creation: {exc.orig}",
+        ) from exc
+    except Exception as exc:
+        await db.rollback()
+        logger.exception("Unexpected error creating event for user %s", current_user.id)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create event: {exc}",
+        ) from exc
 
 
-@router.get("", response_model=list[EventResponse])
+@router.get("/", response_model=list[EventResponse])
 async def read_events(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),

@@ -3,13 +3,22 @@ import { createRoot } from "react-dom/client";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./index.css";
 import App from "./App.tsx";
+import { googleClientId, isGoogleOAuthConfigured } from "./lib/googleAuth";
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+const root = document.getElementById("root");
 
-createRoot(document.getElementById("root")!).render(
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+const app = <App />;
+
+createRoot(root).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <App />
-    </GoogleOAuthProvider>
+    {isGoogleOAuthConfigured ? (
+      <GoogleOAuthProvider clientId={googleClientId}>{app}</GoogleOAuthProvider>
+    ) : (
+      app
+    )}
   </StrictMode>,
 );

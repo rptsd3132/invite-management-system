@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
 const cardVariants = cva(
-  "rounded-xl border shadow-sm overflow-hidden",
+  "rounded-2xl border border-zinc-200/80 bg-white shadow-sm shadow-zinc-900/5 backdrop-blur-sm overflow-hidden",
   {
     variants: {
       pastel: {
@@ -23,14 +23,14 @@ interface CardProps
 
 export function Card({ className, pastel, ...props }: CardProps): React.ReactElement {
   return (
-    <div className={cn(cardVariants({ pastel }), "bg-yellow-100", className)} {...props} />
+    <div className={cn(cardVariants({ pastel }), className)} {...props} />
   );
 }
 
 export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.ReactElement {
-  return <div className={cn("p-4", className)} {...props} />;
+  return <div className={cn("p-5", className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>): React.ReactElement {
-  return <div className={cn("p-4 pt-0", className)} {...props} />;
+  return <div className={cn("p-5 pt-0", className)} {...props} />;
 }

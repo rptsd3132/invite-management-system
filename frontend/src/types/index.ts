@@ -14,11 +14,19 @@ export interface DesignSchema {
 
 export interface Template {
   id: string;
+  user_id: string | null;
   name: string;
   category: string;
   thumbnail_url: string | null;
   design_schema: DesignSchema;
   created_at: string;
+}
+
+export interface CreateTemplatePayload {
+  name: string;
+  category: string;
+  design_schema: DesignSchema;
+  thumbnail_url?: string | null;
 }
 
 export interface User {
@@ -47,6 +55,9 @@ export interface CreateEventPayload {
   event_name: string;
   location: string;
   event_date: string;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   event_metadata?: Record<string, string>;
 }
 
@@ -56,6 +67,9 @@ export interface EventResponse {
   template_id: string;
   event_name: string;
   location: string;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   event_date: string;
   event_metadata: Record<string, string>;
   created_at: string;

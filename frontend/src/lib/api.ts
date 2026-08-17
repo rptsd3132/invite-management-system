@@ -1,7 +1,9 @@
 import axios from "axios";
+import { useAuthStore } from "../store/authStore";
 import type {
   AuthResponse,
   CreateEventPayload,
+  CreateTemplatePayload,
   EventDetailResponse,
   EventResponse,
   InvitationResponse,
@@ -15,23 +17,27 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const stored = localStorage.getItem("auth-storage");
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      const token = parsed?.state?.access_token ?? parsed?.access_token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch {
-      // ignore parse errors
-    }
+  const { access_token } = useAuthStore.getState();
+  if (access_token) {
+    config.headers.Authorization = `Bearer ${access_token}`;
   }
   return config;
 });
 
 export async function getTemplates(): Promise<Template[]> {
   const { data } = await api.get<Template[]>("/api/templates");
+  return data;
+}
+
+export async function getMyTemplates(): Promise<Template[]> {
+  const { data } = await api.get<Template[]>("/api/templates/mine");
+  return data;
+}
+
+export async function createTemplate(
+  payload: CreateTemplatePayload,
+): Promise<Template> {
+  const { data } = await api.post<Template>("/api/templates", payload);
   return data;
 }
 
@@ -80,7 +86,7 @@ export async function createEvent(
 }
 
 export async function getEvents(): Promise<EventResponse[]> {
-  const { data } = await api.get<EventResponse[]>("/api/v1/events");
+  const { data } = await api.get<EventResponse[]>("/api/v1/events/");
   return data;
 }
 

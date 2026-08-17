@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Navigation } from "lucide-react";
 import { getInvitationByToken } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 
@@ -35,6 +35,11 @@ export function InvitationPage(): React.ReactElement {
   }
 
   const { event, participant, template, field_data } = data;
+  const fieldData = {
+    ...field_data,
+    guest_name: participant.guest_name,
+    participant_name: participant.guest_name,
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 flex flex-col">
@@ -51,7 +56,7 @@ export function InvitationPage(): React.ReactElement {
         <div className="w-full max-w-sm">
           <TemplateRenderer
             designSchema={template.design_schema}
-            fieldData={field_data}
+            fieldData={fieldData}
           />
         </div>
 
@@ -83,6 +88,18 @@ export function InvitationPage(): React.ReactElement {
               Decline
             </button>
           </div>
+        )}
+
+        {event.latitude != null && event.longitude != null && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-brand/20 transition-all duration-200 hover:bg-brand/90 hover:shadow-brand/30 active:scale-[0.98]"
+          >
+            <Navigation className="h-4 w-4" />
+            Get Directions
+          </a>
         )}
 
         <p className="mt-12 text-xs text-neutral-400">

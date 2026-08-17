@@ -4,6 +4,7 @@ import { EventDetailsStep } from "./EventDetailsStep";
 import { TemplateSelectionStep } from "./TemplateSelectionStep";
 import { GuestListStep } from "./GuestListStep";
 import { ReviewConfirmStep } from "./ReviewConfirmStep";
+import { StepIndicator } from "../../components/events/StepIndicator";
 
 export interface WizardState {
   eventData: {
@@ -17,12 +18,14 @@ export interface WizardState {
   guests: Array<{ guestName: string; email: string }>;
 }
 
-type WizardAction =
+export type WizardAction =
   | { type: "SET_EVENT_DATA"; payload: Partial<WizardState["eventData"]> }
   | { type: "SET_TEMPLATE"; payload: string }
   | { type: "ADD_GUESTS"; payload: Array<{ guestName: string; email: string }> }
   | { type: "REMOVE_GUEST"; payload: number }
   | { type: "RESET" };
+
+const STEP_LABELS = ["Event Details", "Choose Template", "Guests", "Review"];
 
 const initialState: WizardState = {
   eventData: {
@@ -86,34 +89,8 @@ export function CreateEventWizard(): React.ReactElement {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Step indicator */}
-      <div className="flex items-center gap-2 mb-8">
-        {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => goToStep(i + 1)}
-              className={cnStep(
-                "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors",
-                step === i + 1
-                  ? "bg-brand text-white"
-                  : step > i + 1
-                    ? "bg-brand/20 text-brand"
-                    : "bg-neutral-100 text-neutral-400",
-              )}
-            >
-              {i + 1}
-            </button>
-            {i < TOTAL_STEPS - 1 && (
-              <div
-                className={cnStep(
-                  "h-px w-8 sm:w-12 transition-colors",
-                  step > i + 1 ? "bg-brand" : "bg-neutral-200",
-                )}
-              />
-            )}
-          </div>
-        ))}
+      <div className="mb-10 rounded-2xl border border-zinc-200/80 bg-white/70 px-5 py-4 shadow-sm shadow-zinc-900/5 backdrop-blur-sm sm:px-6">
+        <StepIndicator currentStep={step} labels={STEP_LABELS} onStepClick={goToStep} />
       </div>
 
       {step === 1 && <EventDetailsStep {...stepProps} />}
@@ -122,8 +99,4 @@ export function CreateEventWizard(): React.ReactElement {
       {step === 4 && <ReviewConfirmStep {...stepProps} />}
     </div>
   );
-}
-
-function cnStep(...classes: (string | false | undefined | null)[]): string {
-  return classes.filter(Boolean).join(" ");
 }

@@ -13,14 +13,7 @@ async def create_event(
     event_in: EventCreate,
     user_id: uuid.UUID,
 ) -> Event:
-    event = Event(
-        user_id=user_id,
-        template_id=event_in.template_id,
-        event_name=event_in.event_name,
-        location=event_in.location,
-        event_date=event_in.event_date,
-        event_metadata=event_in.event_metadata,
-    )
+    event = Event(**event_in.model_dump(), user_id=user_id)
     db.add(event)
     await db.commit()
     await db.refresh(event)

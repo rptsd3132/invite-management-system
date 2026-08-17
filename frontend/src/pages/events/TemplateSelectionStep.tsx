@@ -1,20 +1,18 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getTemplates } from "../../lib/api";
 import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
-import type { WizardState } from "./CreateEventWizard";
+import { Button } from "../../components/ui/Button";
+import { useAllTemplates } from "../../hooks/useAllTemplates";
+import { cn } from "../../lib/utils";
+import type { WizardAction, WizardState } from "./CreateEventWizard";
 
 interface Props {
   state: WizardState;
-  dispatch: React.Dispatch<any>;
+  dispatch: React.Dispatch<WizardAction>;
   goToStep: (step: number) => void;
 }
 
 export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): React.ReactElement {
-  const { data: templates, isLoading } = useQuery({
-    queryKey: ["templates"],
-    queryFn: getTemplates,
-  });
+  const { templates, isLoading } = useAllTemplates();
 
   const filtered = useMemo(
     () => (templates ?? []).filter((t) => t.category === state.eventData.category),
@@ -71,15 +69,15 @@ export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): Rea
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-neutral-900">Choose a Template</h2>
-      <p className="mt-1 text-sm text-neutral-500">
+      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Choose a Template</h2>
+      <p className="mt-1 text-sm text-zinc-500">
         Pick an invitation design for your {state.eventData.category} event.
       </p>
 
       {isLoading && (
         <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[3/4] bg-neutral-100 rounded-xl animate-pulse" />
+            <div key={i} className="aspect-[3/4] rounded-xl bg-zinc-100 animate-pulse" />
           ))}
         </div>
       )}
@@ -91,11 +89,12 @@ export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): Rea
               key={tpl.id}
               type="button"
               onClick={() => handleSelect(tpl.id)}
-              className={`text-left rounded-xl border-2 overflow-hidden transition-all ${
+              className={cn(
+                "text-left rounded-2xl border-2 overflow-hidden bg-white shadow-sm shadow-zinc-900/5 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10",
                 state.selectedTemplateId === tpl.id
-                  ? "border-brand ring-2 ring-brand/20"
-                  : "border-neutral-200 hover:border-neutral-300"
-              }`}
+                  ? "border-violet-500 ring-4 ring-violet-500/10"
+                  : "border-zinc-200/80 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md",
+              )}
             >
               <div className="aspect-[3/4] scale-[0.6] origin-top-left overflow-hidden pointer-events-none">
                 <TemplateRenderer
@@ -103,8 +102,8 @@ export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): Rea
                   fieldData={{}}
                 />
               </div>
-              <div className="p-2 border-t border-neutral-100">
-                <p className="text-xs font-medium text-neutral-800 truncate">{tpl.name}</p>
+              <div className="border-t border-zinc-100 p-2.5">
+                <p className="truncate text-xs font-medium text-zinc-800">{tpl.name}</p>
               </div>
             </button>
           ))}
@@ -117,7 +116,7 @@ export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): Rea
       {selectedTemplate && (
         <div className="mt-8 flex justify-center">
           <div className="w-full max-w-sm">
-            <p className="text-sm font-medium text-neutral-700 mb-3">Preview</p>
+            <p className="mb-3 text-sm font-medium text-zinc-700">Preview</p>
             <TemplateRenderer
               designSchema={selectedTemplate.design_schema}
               fieldData={previewFieldData}
@@ -127,20 +126,12 @@ export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): Rea
       )}
 
       <div className="flex justify-between pt-8">
-        <button
-          type="button"
-          onClick={() => goToStep(1)}
-          className="rounded-lg border border-neutral-300 px-6 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
-        >
+        <Button type="button" variant="outline" onClick={() => goToStep(1)}>
           Back
-        </button>
-        <button
-          type="button"
-          onClick={handleNext}
-          className="rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white hover:bg-brand/90 transition-colors"
-        >
+        </Button>
+        <Button type="button" onClick={handleNext}>
           Next: Add Guests
-        </button>
+        </Button>
       </div>
     </div>
   );
