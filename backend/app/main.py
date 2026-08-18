@@ -39,13 +39,8 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-<<<<<<< HEAD
-origins = [
-=======
-
 # Frontend URLs allowed to access the backend API.
 allowed_origins = [
->>>>>>> main
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]

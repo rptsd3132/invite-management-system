@@ -4,11 +4,8 @@ import { EventDetailsStep } from "./EventDetailsStep";
 import { TemplateSelectionStep } from "./TemplateSelectionStep";
 import { GuestListStep } from "./GuestListStep";
 import { ReviewConfirmStep } from "./ReviewConfirmStep";
-<<<<<<< HEAD
 import { StepIndicator } from "../../components/events/StepIndicator";
-=======
 import type { InvitationLanguage } from "../../lib/invitationLanguage";
->>>>>>> main
 
 export interface WizardState {
   eventData: {

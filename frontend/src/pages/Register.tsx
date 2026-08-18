@@ -5,11 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 
 import { useAuthStore } from "../store/authStore";
-<<<<<<< HEAD
-import { loginWithGoogleAccessToken, registerUserApi } from "../lib/api";
-import { signUpSchema, type SignUpFormData } from "../lib/validators";
-import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
-=======
 import {
   loginWithGoogleAccessToken,
   registerUserApi,
@@ -18,7 +13,7 @@ import {
   signUpSchema,
   type SignUpFormData,
 } from "../lib/validators";
->>>>>>> main
+import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 
 export function Register(): React.ReactElement {
   const navigate = useNavigate();
@@ -75,20 +70,7 @@ const googleMutation = useMutation({
 },
 });
 
-<<<<<<< HEAD
-=======
-  const googleLogin = useGoogleLogin({
-    onSuccess: (response) => {
-      googleMutation.mutate(response.access_token);
-    },
-
-    onError: () => {
-      console.error("Google login failed");
-    },
-  });
-
->>>>>>> main
-  const onSubmit = (data: SignUpFormData): void => {
+const onSubmit = (data: SignUpFormData): void => {
     registerMutation.mutate(data);
   };
 
@@ -106,7 +88,6 @@ const googleMutation = useMutation({
         </div>
 
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-<<<<<<< HEAD
           <GoogleSignInButton
             onToken={(token) => googleMutation.mutate(token)}
             isPending={googleMutation.isPending}
@@ -118,28 +99,6 @@ const googleMutation = useMutation({
             idleLabel="Continue with Google"
             pendingLabel="Connecting..."
           />
-=======
-          <button
-            type="button"
-            onClick={() => googleLogin()}
-            disabled={googleMutation.isPending}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <GoogleIcon />
-
-            {googleMutation.isPending
-              ? "Connecting..."
-              : "Continue with Google"}
-          </button>
-
-          {googleMutation.isError && (
-            <p className="mt-3 text-center text-sm text-red-600">
-              {googleMutation.error instanceof Error
-                ? googleMutation.error.message
-                : "Google sign-up failed"}
-            </p>
-          )}
->>>>>>> main
 
           <div className="mt-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-neutral-200" />
@@ -291,36 +250,3 @@ const googleMutation = useMutation({
     </div>
   );
 }
-<<<<<<< HEAD
-=======
-
-function GoogleIcon(): React.ReactElement {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-5 w-5"
-      aria-hidden="true"
-    >
-      <path
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
-        fill="#4285F4"
-      />
-
-      <path
-        d="M12 23c2.97 0 5.46-.98 7.29-2.66l-3.57-2.77c-.98.66-2.24 1.06-3.72 1.06-2.87 0-5.3-1.94-6.17-4.53H2.15v2.84A11 11 0 0 0 12 23Z"
-        fill="#34A853"
-      />
-
-      <path
-        d="M5.83 14.1A6.6 6.6 0 0 1 5.48 12c0-.73.13-1.44.35-2.1V7.07H2.15A11 11 0 0 0 1 12c0 1.78.43 3.45 1.15 4.93l2.86-2.22.82-.61Z"
-        fill="#FBBC05"
-      />
-
-      <path
-        d="M12 5.38c1.62 0 3.07.56 4.21 1.64l3.16-3.15A10.56 10.56 0 0 0 12 1 11 11 0 0 0 2.15 7.07L5.83 9.9C6.7 7.31 9.13 5.38 12 5.38Z"
-        fill="#EA4335"
-      />
-    </svg>
-  );
-}
->>>>>>> main

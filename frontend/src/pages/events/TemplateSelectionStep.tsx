@@ -1,20 +1,15 @@
 import { useMemo, useState } from "react";
-<<<<<<< HEAD
-import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
-import { Button } from "../../components/ui/Button";
-import { useAllTemplates } from "../../hooks/useAllTemplates";
-import { cn } from "../../lib/utils";
-import type { WizardAction, WizardState } from "./CreateEventWizard";
-=======
 import { useQuery } from "@tanstack/react-query";
 
 import { getTemplates } from "../../lib/api";
 import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
 import { TemplateCard } from "../../components/TemplateCard";
 
-import type { WizardState } from "./CreateEventWizard";
-import { formatInvitationDate, getInvitationCopy } from "../../lib/invitationLanguage";
->>>>>>> main
+import type { WizardAction, WizardState } from "./CreateEventWizard";
+import {
+  formatInvitationDate,
+  getInvitationCopy,
+} from "../../lib/invitationLanguage";
 
 interface Props {
   state: WizardState;
@@ -22,10 +17,6 @@ interface Props {
   goToStep: (step: number) => void;
 }
 
-<<<<<<< HEAD
-export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): React.ReactElement {
-  const { templates, isLoading } = useAllTemplates();
-=======
 export function TemplateSelectionStep({
   state,
   dispatch,
@@ -35,7 +26,6 @@ export function TemplateSelectionStep({
     queryKey: ["templates"],
     queryFn: getTemplates,
   });
->>>>>>> main
 
   const [error, setError] = useState("");
 
@@ -123,75 +113,6 @@ export function TemplateSelectionStep({
   };
 
   return (
-<<<<<<< HEAD
-    <div>
-      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Choose a Template</h2>
-      <p className="mt-1 text-sm text-zinc-500">
-        Pick an invitation design for your {state.eventData.category} event.
-      </p>
-
-      {isLoading && (
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="aspect-[3/4] rounded-xl bg-zinc-100 animate-pulse" />
-          ))}
-        </div>
-      )}
-
-      {!isLoading && (
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((tpl) => (
-            <button
-              key={tpl.id}
-              type="button"
-              onClick={() => handleSelect(tpl.id)}
-              className={cn(
-                "text-left rounded-2xl border-2 overflow-hidden bg-white shadow-sm shadow-zinc-900/5 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10",
-                state.selectedTemplateId === tpl.id
-                  ? "border-violet-500 ring-4 ring-violet-500/10"
-                  : "border-zinc-200/80 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md",
-              )}
-            >
-              <div className="aspect-[3/4] scale-[0.6] origin-top-left overflow-hidden pointer-events-none">
-                <TemplateRenderer
-                  designSchema={tpl.design_schema}
-                  fieldData={{}}
-                />
-              </div>
-              <div className="border-t border-zinc-100 p-2.5">
-                <p className="truncate text-xs font-medium text-zinc-800">{tpl.name}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-
-      {/* Live preview */}
-      {selectedTemplate && (
-        <div className="mt-8 flex justify-center">
-          <div className="w-full max-w-sm">
-            <p className="mb-3 text-sm font-medium text-zinc-700">Preview</p>
-            <TemplateRenderer
-              designSchema={selectedTemplate.design_schema}
-              fieldData={previewFieldData}
-            />
-          </div>
-        </div>
-      )}
-
-      <div className="flex justify-between pt-8">
-        <Button type="button" variant="outline" onClick={() => goToStep(1)}>
-          Back
-        </Button>
-        <Button type="button" onClick={handleNext}>
-          Next: Add Guests
-        </Button>
-      </div>
-    </div>
-  );
-=======
     <div className="mx-auto w-full max-w-[1500px]">
       {/* Header */}
       <div className="mb-8">
@@ -611,5 +532,4 @@ function CategoryItem({
       </span>
     </div>
   );
->>>>>>> main
 }

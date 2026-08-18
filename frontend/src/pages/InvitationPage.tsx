@@ -1,14 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-<<<<<<< HEAD
-import { Loader2, Navigation } from "lucide-react";
-=======
-import { Loader2 } from "lucide-react";
-
->>>>>>> main
+import { Loader2, MapPin } from "lucide-react";
 import { getInvitationByToken } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
+import { MapModal } from "../components/events/MapModal";
 
 import {
   formatInvitationDate,
@@ -19,6 +15,8 @@ import {
 
 export function InvitationPage(): React.ReactElement {
   const { token } = useParams<{ token: string }>();
+
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   const {
     data,
@@ -94,20 +92,11 @@ export function InvitationPage(): React.ReactElement {
     );
   }
 
-<<<<<<< HEAD
-  const { event, participant, template, field_data } = data;
-  const fieldData = {
-    ...field_data,
-    guest_name: participant.guest_name,
-    participant_name: participant.guest_name,
-  };
-=======
   const {
     event,
     participant,
     template,
   } = data;
->>>>>>> main
 
   return (
     <div
@@ -130,12 +119,8 @@ export function InvitationPage(): React.ReactElement {
         <div className="w-full max-w-sm">
           <TemplateRenderer
             designSchema={template.design_schema}
-<<<<<<< HEAD
-            fieldData={fieldData}
-=======
             fieldData={localizedFieldData}
             language={language}
->>>>>>> main
           />
         </div>
 
@@ -177,15 +162,24 @@ export function InvitationPage(): React.ReactElement {
         )}
 
         {event.latitude != null && event.longitude != null && (
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${event.latitude},${event.longitude}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-brand/20 transition-all duration-200 hover:bg-brand/90 hover:shadow-brand/30 active:scale-[0.98]"
-          >
-            <Navigation className="h-4 w-4" />
-            Get Directions
-          </a>
+          <>
+            <button
+              type="button"
+              onClick={() => setIsMapModalOpen(true)}
+              className="mt-8 inline-flex max-w-full items-center justify-center gap-2 text-sm font-medium text-neutral-700 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2"
+            >
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span className="truncate">{event.location}</span>
+            </button>
+
+            <MapModal
+              isOpen={isMapModalOpen}
+              onClose={() => setIsMapModalOpen(false)}
+              latitude={event.latitude}
+              longitude={event.longitude}
+              address={event.location}
+            />
+          </>
         )}
 
         <p className="mt-12 text-xs text-neutral-400">

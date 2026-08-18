@@ -10,11 +10,11 @@ const NAV_ITEMS = [
   { to: "/templates", label: "Templates", icon: LayoutTemplate },
 ];
 
-function initialsOf(firstName: string | null, lastName: string | null, email: string): string {
+function initialsOf(firstName: string | null | undefined, lastName: string | null | undefined, email: string | null | undefined): string {
   if (firstName || lastName) {
     return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
   }
-  return email.slice(0, 2).toUpperCase();
+  return (email ?? "").slice(0, 2).toUpperCase();
 }
 
 function Logo(): React.ReactElement {

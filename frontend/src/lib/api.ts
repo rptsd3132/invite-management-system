@@ -20,19 +20,18 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-<<<<<<< HEAD
   const { access_token } = useAuthStore.getState();
-  if (access_token) {
-    config.headers.Authorization = `Bearer ${access_token}`;
-=======
-  let accessToken: string | null = localStorage.getItem("token");
+  let accessToken: string | null = access_token ?? null;
 
   if (!accessToken) {
     const authStorage = localStorage.getItem("auth-storage");
 
     if (authStorage) {
       try {
-        const parsed = JSON.parse(authStorage);
+        const parsed: {
+          state?: { access_token?: string };
+          access_token?: string;
+        } = JSON.parse(authStorage);
 
         accessToken =
           parsed?.state?.access_token ??
@@ -42,7 +41,6 @@ api.interceptors.request.use((config) => {
         accessToken = null;
       }
     }
->>>>>>> main
   }
 
   if (accessToken) {
@@ -126,7 +124,7 @@ export async function createEvent(
   payload: CreateEventPayload,
 ): Promise<EventResponse> {
   const { data } = await api.post<EventResponse>(
-    "/api/v1/events",
+    "/api/v1/events/",
     payload,
   );
 
@@ -134,14 +132,7 @@ export async function createEvent(
 }
 
 export async function getEvents(): Promise<EventResponse[]> {
-<<<<<<< HEAD
   const { data } = await api.get<EventResponse[]>("/api/v1/events/");
-=======
-  const { data } = await api.get<EventResponse[]>(
-    "/api/v1/events",
-  );
-
->>>>>>> main
   return data;
 }
 
