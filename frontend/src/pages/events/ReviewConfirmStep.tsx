@@ -123,6 +123,9 @@ export function ReviewConfirmStep({ state, goToStep, handleFinish }: Props): Rea
         event_date: new Date(
           state.eventData.eventDate,
         ).toISOString(),
+        address: state.eventData.location,
+        latitude: state.eventData.latitude,
+        longitude: state.eventData.longitude,
         event_metadata: metadata,
       });
 

@@ -1,7 +1,9 @@
 import type { ReactElement } from "react";
-
+import { ArrowRight } from "lucide-react";
 import { cn } from "../lib/utils";
 import { resolveTemplateImage } from "./assets/templateImages";
+import { TemplateRenderer } from "./ui/TemplateRenderer";
+import type { Template } from "../types";
 
 interface TemplateCardProps {
   category: string;
@@ -11,6 +13,8 @@ interface TemplateCardProps {
   className?: string;
   templateName?: string;
   selected?: boolean;
+  designSchema?: Template["design_schema"];
+  sampleFieldData?: Record<string, string | undefined>;
 }
 
 function getCategoryStyle(category: string): {
@@ -47,6 +51,8 @@ export function TemplateCard({
   className,
   templateName,
   selected = false,
+  designSchema,
+  sampleFieldData,
 }: TemplateCardProps): ReactElement {
   const imageSource =
     resolveTemplateImage(thumbnailUrl) ??
@@ -76,67 +82,88 @@ export function TemplateCard({
         className,
       )}
     >
-      {/* Image */}
+      {/* Image / Live Preview */}
       <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
-        {imageSource ? (
+        {designSchema && sampleFieldData ? (
+          /* Live preview mode */
+          <div className="relative h-full w-full overflow-hidden">
+            <div className="pointer-events-none absolute left-0 top-0 h-[550px] w-[400px] origin-top-left scale-[0.55] sm:scale-[0.6]">
+              <TemplateRenderer
+                designSchema={designSchema}
+                fieldData={sampleFieldData}
+              />
+            </div>
+
+            {/* Hover overlay */}
+            <div
+              className="
+                absolute inset-0 z-10
+                opacity-0 group-hover:opacity-100
+                transition-opacity duration-200
+                bg-zinc-900/40 backdrop-blur-[2px]
+                flex flex-col justify-end p-4
+              "
+            >
+              <span
+                className="
+                  inline-flex w-fit items-center gap-2
+                  rounded-xl bg-white px-5 py-2.5
+                  text-sm font-semibold text-zinc-900
+                  shadow-lg
+                  transition-transform duration-200
+                  group-hover:translate-y-0
+                  translate-y-2
+                "
+              >
+                Use Template
+                <ArrowRight className="h-4 w-4" />
+              </span>
+            </div>
+          </div>
+        ) : imageSource ? (
+          /* Static image mode (existing) */
           <img
             src={imageSource}
             alt={templateName ?? category}
             className="
-              h-full
-              w-full
-              object-cover
-              transition-transform
-              duration-1000
-              ease-out
+              h-full w-full object-cover
+              transition-transform duration-1000 ease-out
               group-hover:scale-[1.05]
             "
           />
         ) : (
           <div
             className="
-              flex
-              h-full
-              items-center
-              justify-center
-              bg-neutral-100
-              text-sm
-              text-neutral-400
+              flex h-full items-center justify-center
+              bg-neutral-100 text-sm text-neutral-400
             "
           >
             No Preview
           </div>
         )}
 
-        {/* Image overlays */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            bg-gradient-to-t
-            from-black/35
-            via-transparent
-            to-black/5
-          "
-        />
-
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            bg-gradient-to-br
-            from-white/10
-            via-transparent
-            to-transparent
-          "
-        />
+        {/* Image overlays (static mode only) */}
+        {!designSchema && (
+          <>
+            <div
+              className="
+                pointer-events-none absolute inset-0
+                bg-gradient-to-t from-black/35 via-transparent to-black/5
+              "
+            />
+            <div
+              className="
+                pointer-events-none absolute inset-0
+                bg-gradient-to-br from-white/10 via-transparent to-transparent
+              "
+            />
+          </>
+        )}
 
         {/* Premium badge */}
         <div
           className={cn(
-            "absolute right-3 top-3",
+            "absolute right-3 top-3 z-20",
             "inline-flex items-center gap-1.5",
             "rounded-full px-3 py-1.5",
             "text-[9px] font-bold uppercase tracking-[0.16em]",
@@ -153,39 +180,24 @@ export function TemplateCard({
         {selected && (
           <div
             className="
-              absolute
-              left-3
-              top-3
-              flex
-              h-9
-              w-9
-              items-center
-              justify-center
-              rounded-full
-              bg-brand
-              text-sm
-              font-bold
-              text-white
-              shadow-lg
+              absolute left-3 top-3 z-20
+              flex h-9 w-9 items-center justify-center
+              rounded-full bg-brand text-sm font-bold text-white shadow-lg
             "
           >
             ✓
           </div>
         )}
 
-        {/* Bottom glass gradient */}
-        <div
-          className="
-            pointer-events-none
-            absolute
-            inset-x-0
-            bottom-0
-            h-20
-            bg-gradient-to-t
-            from-black/25
-            to-transparent
-          "
-        />
+        {/* Bottom glass gradient (static mode only) */}
+        {!designSchema && (
+          <div
+            className="
+              pointer-events-none absolute inset-x-0 bottom-0 h-20
+              bg-gradient-to-t from-black/25 to-transparent
+            "
+          />
+        )}
       </div>
 
       {/* Footer */}

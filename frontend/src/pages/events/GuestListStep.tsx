@@ -65,7 +65,11 @@ export function GuestListStep({ state, dispatch, goToStep }: Props): React.React
     <div>
       <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Guest List</h2>
       <p className="mt-1 text-sm text-zinc-500">
-        Add people you want to invite ({state.guests.length} added).
+        Add people you want to invite to{" "}
+        <span className="font-medium text-zinc-700">
+          {state.eventData.eventName || "your event"}
+        </span>{" "}
+        ({state.guests.length} added).
       </p>
 
       <div className="mt-8 rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm shadow-zinc-900/5 sm:p-8">
@@ -151,7 +155,7 @@ export function GuestListStep({ state, dispatch, goToStep }: Props): React.React
             Back
           </Button>
           <Button type="button" onClick={handleNext}>
-            Next: Review
+            Continue to Review
           </Button>
         </div>
       </div>

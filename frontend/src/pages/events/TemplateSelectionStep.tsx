@@ -109,32 +109,13 @@ export function TemplateSelectionStep({
       return;
     }
 
-    goToStep(3);
+    goToStep(2);
   };
 
   return (
     <div className="mx-auto w-full max-w-[1500px]">
       {/* Header */}
       <div className="mb-8">
-        <button
-          type="button"
-          onClick={() => goToStep(1)}
-          className="
-            mb-4
-            inline-flex
-            items-center
-            gap-2
-            text-sm
-            font-medium
-            text-neutral-500
-            transition-colors
-            hover:text-neutral-900
-          "
-        >
-          <span>←</span>
-          Back to Create Event
-        </button>
-
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-neutral-950 md:text-4xl">
@@ -369,34 +350,12 @@ export function TemplateSelectionStep({
           mt-10
           flex
           items-center
-          justify-between
+          justify-end
           border-t
           border-neutral-200
           pt-8
         "
       >
-        <button
-          type="button"
-          onClick={() => goToStep(1)}
-          className="
-            rounded-xl
-            border
-            border-neutral-300
-            bg-white
-            px-6
-            py-3
-            text-sm
-            font-semibold
-            text-neutral-700
-            shadow-sm
-            transition-all
-            hover:border-neutral-400
-            hover:bg-neutral-50
-          "
-        >
-          ← Back
-        </button>
-
         <button
           type="button"
           onClick={handleNext}
@@ -415,7 +374,7 @@ export function TemplateSelectionStep({
             hover:shadow-[0_14px_40px_rgba(147,51,234,0.30)]
           "
         >
-          Next: Add Guests →
+          Next: Event Details →
         </button>
       </div>
     </div>

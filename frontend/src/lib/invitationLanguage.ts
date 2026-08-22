@@ -17,7 +17,9 @@ export interface InvitationCopy {
   brideName: string;
   groomName: string;
   birthdayPersonName: string;
-  nextChooseTemplate: string;
+  nextEventDetails: string;
+  continueToGuests: string;
+  continueToReview: string;
   reviewConfirm: string;
   reviewHelp: string;
   name: string;
@@ -63,7 +65,9 @@ export const invitationCopy: Record<InvitationLanguage, InvitationCopy> = {
     brideName: "Bride Name",
     groomName: "Groom Name",
     birthdayPersonName: "Birthday Person Name",
-    nextChooseTemplate: "Next: Choose Template",
+    nextEventDetails: "Next: Event Details",
+    continueToGuests: "Continue to Guests",
+    continueToReview: "Continue to Review",
     reviewConfirm: "Review & Confirm",
     reviewHelp: "Verify everything looks correct before creating.",
     name: "Name",
@@ -108,7 +112,9 @@ export const invitationCopy: Record<InvitationLanguage, InvitationCopy> = {
     brideName: "මනාලියගේ නම",
     groomName: "මනාලයාගේ නම",
     birthdayPersonName: "උපන්දිනය සමරන අයගේ නම",
-    nextChooseTemplate: "ඊළඟට: ආරාධනා පත්‍රය තෝරන්න",
+    nextEventDetails: "ඊළඟට: උත්සව විස්තර",
+    continueToGuests: "ආරාධිතයින් වෙත යන්න",
+    continueToReview: "සමාලෝචනය වෙත යන්න",
     reviewConfirm: "පරීක්ෂා කර තහවුරු කරන්න",
     reviewHelp: "සාදීමට පෙර සියලු විස්තර නිවැරදිදැයි පරීක්ෂා කරන්න.",
     name: "නම",

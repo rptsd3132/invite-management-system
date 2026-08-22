@@ -15,6 +15,8 @@ export interface WizardState {
     category: string;
     language: InvitationLanguage;
     metadata: Record<string, string>;
+    latitude: number | null;
+    longitude: number | null;
   };
   selectedTemplateId: string | null;
   guests: Array<{ guestName: string; email: string }>;
@@ -27,7 +29,7 @@ export type WizardAction =
   | { type: "REMOVE_GUEST"; payload: number }
   | { type: "RESET" };
 
-const STEP_LABELS = ["Event Details", "Choose Template", "Guests", "Review"];
+const STEP_LABELS = ["Choose Template", "Event Details", "Guests", "Review"];
 
 const initialState: WizardState = {
   eventData: {
@@ -37,6 +39,8 @@ const initialState: WizardState = {
     category: "Wedding",
     language: "en",
     metadata: {},
+    latitude: null,
+    longitude: null,
   },
   selectedTemplateId: null,
   guests: [],
@@ -70,11 +74,22 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
 
 const TOTAL_STEPS = 4;
 
+function initReducer(searchParams: URLSearchParams): WizardState {
+  const templateId = searchParams.get("templateId");
+  return {
+    ...initialState,
+    selectedTemplateId: templateId,
+  };
+}
+
 export function CreateEventWizard(): React.ReactElement {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const step = parseInt(searchParams.get("step") ?? "1", 10);
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const requestedStep = parseInt(searchParams.get("step") ?? "1", 10);
+  const [state, dispatch] = useReducer(reducer, searchParams, initReducer);
+
+  const step =
+    requestedStep > 1 && !state.selectedTemplateId ? 1 : Math.min(Math.max(requestedStep, 1), TOTAL_STEPS);
 
   const goToStep = useCallback(
     (s: number) => {
@@ -96,8 +111,8 @@ export function CreateEventWizard(): React.ReactElement {
         <StepIndicator currentStep={step} labels={STEP_LABELS} onStepClick={goToStep} />
       </div>
 
-      {step === 1 && <EventDetailsStep {...stepProps} />}
-      {step === 2 && <TemplateSelectionStep {...stepProps} />}
+      {step === 1 && <TemplateSelectionStep {...stepProps} />}
+      {step === 2 && <EventDetailsStep {...stepProps} />}
       {step === 3 && <GuestListStep {...stepProps} />}
       {step === 4 && <ReviewConfirmStep {...stepProps} />}
     </div>

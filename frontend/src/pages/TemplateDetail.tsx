@@ -505,13 +505,7 @@ export function TemplateDetail(): React.ReactElement {
               <div className="border-t border-neutral-100 p-5 sm:p-6">
                 <button
                   type="button"
-                  onClick={() =>
-                    navigate("/create-event", {
-                      state: {
-                        templateId: id,
-                      },
-                    })
-                  }
+                  onClick={() => navigate("/events/create")}
                   className={cn(
                     "flex w-full items-center justify-center gap-2",
                     "rounded-2xl px-6 py-4",

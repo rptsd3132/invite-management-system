@@ -5,6 +5,7 @@ import { UploadCloud, ArrowRight } from "lucide-react";
 import { getTemplates } from "../lib/api";
 import { Card } from "../components/ui/Card";
 import { TemplateCard } from "../components/TemplateCard";
+import { DynamicTemplateCarousel } from "../components/ui/DynamicTemplateCarousel";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
@@ -59,10 +60,6 @@ export function Dashboard(): React.ReactElement {
     }).map((t) => t.category);
   }, [templates]);
 
-  const heroThumbnails = useMemo(() => {
-    return templates?.filter((t): t is Template & { thumbnail_url: string } => t.thumbnail_url !== null).slice(0, 2) ?? [];
-  }, [templates]);
-
   const scrollToGallery = (): void => {
     galleryRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -92,36 +89,12 @@ export function Dashboard(): React.ReactElement {
 
       {/* Hero */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-16 rounded-2xl bg-neutral-100/60 p-6 md:p-10">
-        {/* Left — decorative image area */}
-        <div className="relative h-64 md:h-80 w-full">
-          {heroThumbnails.length > 0 ? (
-            <>
-              <div className="absolute top-4 left-2 w-48 sm:w-56 -rotate-3 shadow-lg rounded-xl overflow-hidden bg-white">
-                <img
-                  src={heroThumbnails[0].thumbnail_url}
-                  alt=""
-                  className="w-full aspect-[4/3] object-cover"
-                />
-              </div>
-              {heroThumbnails.length > 1 && (
-                <div className="absolute bottom-4 right-2 w-40 sm:w-48 rotate-2 shadow-lg rounded-xl overflow-hidden bg-white">
-                  <img
-                    src={heroThumbnails[1].thumbnail_url}
-                    alt=""
-                    className="w-full aspect-[4/3] object-cover"
-                  />
-                </div>
-              )}
-            </>
+        {/* Left — dynamic template carousel */}
+        <div className="w-full">
+          {templates && templates.length > 0 ? (
+            <DynamicTemplateCarousel templates={templates} />
           ) : (
-            <>
-              <div className="absolute top-4 left-2 w-48 sm:w-56 -rotate-3 shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-pastel-peach to-pastel-blush">
-                <div className="aspect-[4/3]" />
-              </div>
-              <div className="absolute bottom-4 right-2 w-40 sm:w-48 rotate-2 shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-pastel-sky to-pastel-lilac">
-                <div className="aspect-[4/3]" />
-              </div>
-            </>
+            <div className="aspect-[3/4] md:aspect-[4/3] rounded-2xl bg-gradient-to-br from-pastel-peach to-pastel-blush" />
           )}
         </div>
 

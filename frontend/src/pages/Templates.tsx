@@ -1,133 +1,48 @@
-import { useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { getTemplates } from "../lib/api";
+import { TemplateCard } from "../components/TemplateCard";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
-import type { Template } from "../types";
 
-const DEFAULT_TYPOGRAPHY = {
-  title_classes:
-    "font-serif text-[clamp(1.5rem,5vw,2.5rem)] font-semibold text-white",
-  accent_classes:
-    "font-serif text-[clamp(1rem,3.5vw,1.5rem)] italic text-white/90",
-  body_classes:
-    "text-[clamp(0.7rem,2vw,0.875rem)] uppercase tracking-[0.18em] text-white/80",
-};
+const FILTER_CATEGORIES = ["All", "Wedding", "Birthday", "Office", "Party"] as const;
 
-const DEFAULT_DESIGN_SCHEMA = {
-  container_classes:
-    "relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl shadow-xl",
-  background: "bg-gradient-to-br from-slate-700 to-slate-950",
-  decorations: [] as string[],
-  typography: DEFAULT_TYPOGRAPHY,
-  required_fields: [] as string[],
-};
+function getSampleFieldData(category: string): Record<string, string | undefined> {
+  if (category === "Wedding") {
+    return {
+      event_name: "Sarah & Michael",
+      location: "St. Patrick Cathedral",
+      event_date: "2026-10-15T18:00:00",
+      bride_name: "Sarah",
+      groom_name: "Michael",
+      host_name: "The Anderson Family",
+    };
+  }
 
-const categoryColors: Record<string, string> = {
-  Wedding: "bg-pink-100 text-pink-700 border-pink-200",
-  Office: "bg-blue-100 text-blue-700 border-blue-200",
-  Birthday: "bg-yellow-100 text-yellow-700 border-yellow-200",
-};
+  if (category === "Birthday") {
+    return {
+      event_name: "Lucas's 10th Birthday",
+      location: "Skyline Arcade Zone",
+      event_date: "2026-09-20T15:00:00",
+      birthday_person_name: "Lucas",
+      host_name: "Emily & Mark",
+    };
+  }
 
-function TemplatePreview({ template }: { template: Template }) {
-  const navigate = useNavigate();
-
-  const colorClass =
-    categoryColors[template.category] ??
-    "bg-neutral-100 text-neutral-700 border-neutral-200";
-
-  const rawSchema = template.design_schema ?? {};
-
-  const designSchema = {
-    ...DEFAULT_DESIGN_SCHEMA,
-    ...rawSchema,
-
-    decorations: Array.isArray(rawSchema.decorations)
-      ? rawSchema.decorations
-      : [],
-
-    required_fields: Array.isArray(rawSchema.required_fields)
-      ? rawSchema.required_fields
-      : [],
-
-    typography: {
-      ...DEFAULT_TYPOGRAPHY,
-      ...(rawSchema.typography ?? {}),
-    },
+  return {
+    event_name: "Annual Gala & Awards",
+    location: "Grand Plaza Ballroom",
+    event_date: "2026-12-05T19:30:00",
+    host_name: "Nexus Tech Corp",
   };
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(`/templates/${template.id}`)}
-      className="group rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
-    >
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
-        <div className="p-3">
-          <div
-            className={cn(
-              "relative isolate overflow-hidden rounded-lg",
-              designSchema.container_classes,
-              designSchema.background,
-            )}
-            style={{
-              maxWidth: "100%",
-              aspectRatio: "3/4",
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/35" />
-
-            <div className="pointer-events-none absolute inset-3 rounded-md border border-white/40" />
-
-            <div className="relative z-10 flex h-full flex-col items-center justify-center p-4 text-center">
-              <span
-                className={cn(
-                  designSchema.typography.title_classes,
-                  "max-w-full truncate text-base",
-                )}
-              >
-                {template.name}
-              </span>
-
-              <div
-                className={cn(
-                  designSchema.typography.accent_classes,
-                  "mt-1 text-xs",
-                )}
-              >
-                Preview
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-2 px-3 pb-3">
-          <span className="truncate text-sm font-medium text-neutral-800">
-            {template.name}
-          </span>
-
-          <span
-            className={cn(
-              "shrink-0 rounded-full border px-2 py-0.5 text-xs",
-              colorClass,
-            )}
-          >
-            {template.category}
-          </span>
-        </div>
-      </div>
-    </button>
-  );
 }
-
-
 
 export function Templates(): React.ReactElement {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const categoryFilter = searchParams.get("category");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: templates, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["templates"],
@@ -136,17 +51,28 @@ export function Templates(): React.ReactElement {
 
   const filtered = useMemo(() => {
     if (!templates) return [];
-    if (!categoryFilter) return templates;
-    return templates.filter((t) => t.category === categoryFilter);
-  }, [templates, categoryFilter]);
 
-  const categories = useMemo(() => {
-    if (!templates) return [];
-    return [...new Set(templates.map((t) => t.category))];
-  }, [templates]);
+    let result = templates;
+
+    if (activeCategory !== "All") {
+      result = result.filter((t) => t.category === activeCategory);
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      result = result.filter(
+        (t) =>
+          t.name.toLowerCase().includes(query) ||
+          t.category.toLowerCase().includes(query),
+      );
+    }
+
+    return result;
+  }, [templates, activeCategory, searchQuery]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
           <ArrowLeft className="h-4 w-4" />
@@ -154,40 +80,64 @@ export function Templates(): React.ReactElement {
         </Button>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-            {categoryFilter ? categoryFilter : "All"} Templates
+            Template Gallery
           </h1>
           <p className="text-sm text-neutral-500 mt-1">
-            {categoryFilter
-              ? `Showing ${filtered.length} template${filtered.length !== 1 ? "s" : ""}`
-              : `${templates?.length ?? 0} template${templates?.length !== 1 ? "s" : ""} available`}
+            Browse and choose a design for your invitation.
           </p>
         </div>
       </div>
 
-      {categories.length > 1 && !categoryFilter && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => navigate(`/templates?category=${encodeURIComponent(cat)}`)}
-              className={cn(
-                "text-sm px-3 py-1 rounded-full border transition-colors",
-                categoryColors[cat] ?? "bg-neutral-100 text-neutral-700 border-neutral-200",
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* Search + Filter Pills */}
+      <div className="mb-8 space-y-4">
+        {/* Search input */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search templates..."
+            className="
+              w-full rounded-xl border border-neutral-200 bg-white
+              py-2.5 pl-10 pr-4 text-sm text-neutral-900
+              placeholder:text-neutral-400
+              focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20
+              transition-colors
+            "
+          />
         </div>
-      )}
 
+        {/* Category pills */}
+        <div className="flex flex-wrap gap-2">
+          {FILTER_CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200",
+                  isActive
+                    ? "border-brand bg-brand text-white shadow-sm"
+                    : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50",
+                )}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Loading skeleton */}
       {isLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="animate-pulse rounded-xl border border-neutral-200 bg-white overflow-hidden">
-              <div className="aspect-[3/4] bg-neutral-100 m-3 rounded-lg" />
-              <div className="p-3 space-y-2">
+            <div key={i} className="animate-pulse rounded-[22px] border border-neutral-200 bg-white overflow-hidden">
+              <div className="aspect-[3/4] bg-neutral-100" />
+              <div className="p-4 space-y-2">
                 <div className="h-4 bg-neutral-100 rounded w-3/4" />
                 <div className="h-3 bg-neutral-100 rounded w-1/4" />
               </div>
@@ -196,6 +146,7 @@ export function Templates(): React.ReactElement {
         </div>
       )}
 
+      {/* Error state */}
       {isError && (
         <div className="flex flex-col items-center gap-4 rounded-xl border border-red-200 bg-red-50 p-8 text-center">
           <p className="text-red-700">
@@ -207,26 +158,46 @@ export function Templates(): React.ReactElement {
         </div>
       )}
 
+      {/* Empty state */}
       {!isLoading && !isError && filtered.length === 0 && (
         <div className="flex flex-col items-center gap-4 rounded-xl border border-neutral-200 bg-white p-12 text-center">
           <p className="text-lg font-medium text-neutral-600">No templates found</p>
           <p className="text-sm text-neutral-400">
-            {categoryFilter
-              ? `No templates in the "${categoryFilter}" category yet.`
-              : "Templates will appear here once they are added."}
+            {searchQuery
+              ? `No templates matching "${searchQuery}".`
+              : activeCategory !== "All"
+                ? `No templates in the "${activeCategory}" category yet.`
+                : "Templates will appear here once they are added."}
           </p>
-          {categoryFilter && (
-            <Button variant="outline" onClick={() => navigate("/templates")}>
-              View All Templates
+          {(searchQuery || activeCategory !== "All") && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setActiveCategory("All");
+              }}
+            >
+              Clear Filters
             </Button>
           )}
         </div>
       )}
 
+      {/* Template grid */}
       {!isLoading && !isError && filtered.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           {filtered.map((template) => (
-            <TemplatePreview key={template.id} template={template} />
+            <TemplateCard
+              key={template.id}
+              category={template.category}
+              thumbnailUrl={template.thumbnail_url}
+              templateName={template.name}
+              designSchema={template.design_schema}
+              sampleFieldData={getSampleFieldData(template.category)}
+              onClick={() =>
+                navigate(`/events/create?step=2&templateId=${template.id}`)
+              }
+            />
           ))}
         </div>
       )}
