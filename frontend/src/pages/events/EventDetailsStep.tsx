@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
 import L from "leaflet";
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -58,11 +59,15 @@ function MapClickHandler({ onSelect }: { onSelect: (lat: number, lng: number) =>
   return null;
 }
 
+
 export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.ReactElement {
   const { eventData } = state;
   const language = eventData.language;
   const copy = getInvitationCopy(language);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isReverseGeocoding, setIsReverseGeocoding] = useState(false);
+  const isManualUpdateRef = useRef(false);
+  const reverseGeocodingSeqRef = useRef(0);
 
   const extraFields = getCategorySpecificFields(eventData.category, language);
 
@@ -77,6 +82,10 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
   };
 
   useEffect(() => {
+    if (isManualUpdateRef.current) {
+      isManualUpdateRef.current = false;
+      return;
+    }
     const query = eventData.location.trim();
     if (query.length < 3) return;
     const timeoutId = setTimeout(() => {
@@ -102,7 +111,31 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
   }, [eventData.location, dispatch]);
 
   const handleMapClick = (lat: number, lng: number): void => {
-    dispatch({ type: "SET_EVENT_DATA", payload: { latitude: lat, longitude: lng } });
+    const fallbackAddress = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    isManualUpdateRef.current = true;
+    dispatch({ type: "SET_EVENT_DATA", payload: { latitude: lat, longitude: lng, location: fallbackAddress } });
+
+    const sequence = ++reverseGeocodingSeqRef.current;
+    setIsReverseGeocoding(true);
+
+    void fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+      headers: { "User-Agent": "invite-management-system/1.0 (event organizer location picker)" },
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Reverse geocoding failed");
+        const data = (await response.json()) as { display_name?: string };
+        if (sequence !== reverseGeocodingSeqRef.current) return;
+        isManualUpdateRef.current = true;
+        dispatch({ type: "SET_EVENT_DATA", payload: { location: data.display_name ?? fallbackAddress } });
+      })
+      .catch(() => {
+        if (sequence !== reverseGeocodingSeqRef.current) return;
+      })
+      .finally(() => {
+        if (sequence === reverseGeocodingSeqRef.current) {
+          setIsReverseGeocoding(false);
+        }
+      });
   };
 
   const validate = (): boolean => {
@@ -161,7 +194,18 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700">{copy.location}</label>
-          <input type="text" value={eventData.location} onChange={(e) => updateField("location", e.target.value)} className={inputClass} placeholder={language === "si" ? "උදා: ප්‍රධාන සම්මන්ත්‍රණ ශාලාව" : "e.g. Convention Center"} />
+          <div className="relative">
+            <input
+              type="text"
+              value={eventData.location}
+              onChange={(e) => updateField("location", e.target.value)}
+              className={[inputClass, isReverseGeocoding ? "pr-10" : ""].join(" ")}
+              placeholder={isReverseGeocoding ? (language === "si" ? "ලිපිනය සොයමින්..." : "Fetching address...") : (language === "si" ? "උදා: ප්‍රධාන සම්මන්ත්‍රණ ශාලාව" : "e.g. Convention Center")}
+            />
+            {isReverseGeocoding && (
+              <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand" />
+            )}
+          </div>
           {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
           <div className="mt-3 h-64 overflow-hidden rounded-xl border border-neutral-200">
             <MapContainer center={mapCenter} zoom={hasCoords ? 15 : DEFAULT_ZOOM} className="h-full w-full" scrollWheelZoom>
@@ -171,7 +215,7 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
               {hasCoords && <Marker position={[eventData.latitude as number, eventData.longitude as number]} />}
             </MapContainer>
           </div>
-          <p className="mt-1.5 text-xs text-neutral-400">{hasCoords ? `${eventData.latitude?.toFixed(5)}, ${eventData.longitude?.toFixed(5)} — click map to refine pin` : "Type a location above to move the pin, or click the map to place it."}</p>
+          <p className="mt-1.5 text-xs text-neutral-400">{hasCoords ? `${eventData.latitude?.toFixed(5)}, ${eventData.longitude?.toFixed(5)} — click map to refine pin and fetch address` : "Type a location above to move the pin, or click the map to place it and fetch the address automatically."}</p>
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700">{copy.dateTime}</label>

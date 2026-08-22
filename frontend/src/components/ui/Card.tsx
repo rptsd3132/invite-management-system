@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
 const cardVariants = cva(
-  "rounded-2xl border border-zinc-200/80 bg-white shadow-sm shadow-zinc-900/5 backdrop-blur-sm overflow-hidden",
+  "rounded-3xl border border-stone-100 bg-white/90 backdrop-blur-sm shadow-[0_10px_40px_-10px_rgba(0,0,0,0.03)] overflow-hidden",
   {
     variants: {
       pastel: {

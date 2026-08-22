@@ -2,18 +2,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10 focus-visible:border-violet-500 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#706FD3]/10 focus-visible:border-[#706FD3] disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-sm shadow-violet-600/25 hover:shadow-md hover:shadow-violet-600/30 hover:brightness-110",
+          "bg-gradient-to-r from-[#706FD3] to-indigo-600 text-white shadow-sm shadow-[#706FD3]/25 hover:shadow-lg hover:shadow-[#706FD3]/20 hover:-translate-y-[1px] hover:brightness-110",
         outline:
-          "border border-zinc-200 bg-white text-zinc-700 shadow-sm hover:bg-zinc-100/80 hover:text-zinc-900",
-        ghost: "text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900",
+          "border border-stone-200 bg-white/80 backdrop-blur-sm text-zinc-700 shadow-sm hover:bg-stone-50 hover:text-zinc-900",
+        ghost: "text-zinc-600 hover:bg-stone-100/80 hover:text-zinc-900",
         secondary:
-          "bg-zinc-100 text-zinc-700 hover:bg-zinc-200/80 hover:text-zinc-900",
-        danger: "bg-red-600 text-white shadow-sm hover:bg-red-700",
+          "bg-stone-100 text-zinc-700 hover:bg-stone-200/80 hover:text-zinc-900",
+        danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow-lg hover:shadow-red-600/20 hover:-translate-y-[1px]",
       },
       size: {
         sm: "h-9 px-3.5 text-sm",

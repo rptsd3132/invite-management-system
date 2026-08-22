@@ -1,6 +1,11 @@
+import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { getTemplates } from "../lib/api";
+import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 import { cn } from "../lib/utils";
+import type { Template } from "../types";
 
 const CATEGORIES = [
   { label: "Wedding", color: "bg-orange-100", to: "/templates?category=Wedding" },
@@ -20,10 +25,42 @@ const SAMPLE_TITLES: Record<string, string> = {
   Office: "You're Invited",
 };
 
+function getSampleFieldData(category: string): Record<string, string | undefined> {
+  if (category === "Wedding") {
+    return {
+      event_name: "Sarah & Michael",
+      location: "St. Patrick Cathedral",
+      event_date: "2026-10-15T18:00:00",
+      bride_name: "Sarah",
+      groom_name: "Michael",
+      host_name: "The Anderson Family",
+    };
+  }
+
+  if (category === "Birthday") {
+    return {
+      event_name: "Lucas's 10th Birthday",
+      location: "Skyline Arcade Zone",
+      event_date: "2026-09-20T15:00:00",
+      birthday_person_name: "Lucas",
+      host_name: "Emily & Mark",
+    };
+  }
+
+  return {
+    event_name: "Annual Gala & Awards",
+    location: "Grand Plaza Ballroom",
+    event_date: "2026-12-05T19:30:00",
+    host_name: "Nexus Tech Corp",
+  };
+}
+
 interface CategoryCardProps {
   label: string;
   color: string;
   sampleTitle: string;
+  template?: Template;
+  index: number;
   onSelect: () => void;
 }
 
@@ -31,25 +68,54 @@ function CategoryCard({
   label,
   color,
   sampleTitle,
+  template,
+  index,
   onSelect,
 }: CategoryCardProps): React.ReactElement {
+  const isEven = index % 2 === 0;
+
   return (
     <button
       type="button"
       onClick={onSelect}
       className={cn(
-        "group flex h-56 flex-col items-center rounded-2xl p-4 pt-6 text-left shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-zinc-900/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10",
+        "group relative flex flex-col items-center justify-center p-6 rounded-3xl overflow-hidden aspect-[4/5] cursor-pointer",
+        "transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-zinc-900/10",
+        "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10",
         color,
       )}
     >
-      <div className="flex w-full flex-1 items-center justify-center">
-        <div className="flex aspect-[3/4] w-3/4 max-w-32 rotate-[-3deg] items-center justify-center rounded-lg bg-white p-2 shadow-md transition-transform duration-300 ease-out group-hover:rotate-0 group-hover:scale-105">
-          <span className="text-center text-[11px] font-medium tracking-wide text-zinc-500">
-            {sampleTitle}
-          </span>
-        </div>
+      {/* Inner tilted white card */}
+      <div
+        className={cn(
+          "bg-white p-2 rounded-xl shadow-md transition-all duration-300 ease-out",
+          "aspect-[3/4] w-3/4 max-w-[200px] overflow-hidden",
+          "group-hover:rotate-0 group-hover:scale-105",
+          isEven ? "rotate-[-4deg]" : "rotate-[4deg]",
+        )}
+      >
+        {template ? (
+          <div className="pointer-events-none relative h-full w-full">
+            <div className="absolute left-0 top-0 h-[600px] w-[400px] origin-top-left scale-[0.35] sm:scale-[0.4]">
+              <TemplateRenderer
+                designSchema={template.design_schema}
+                fieldData={getSampleFieldData(template.category)}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <span className="text-center text-[11px] font-medium tracking-wide text-zinc-500">
+              {sampleTitle}
+            </span>
+          </div>
+        )}
       </div>
-      <span className="mt-4 text-sm font-semibold text-zinc-800">{label}</span>
+
+      {/* Category label */}
+      <span className="mt-4 text-sm font-semibold text-zinc-800 z-10">
+        {label}
+      </span>
     </button>
   );
 }
@@ -128,6 +194,21 @@ function AIPremiumBanner(): React.ReactElement {
 export function Landing(): React.ReactElement {
   const navigate = useNavigate();
 
+  const { data: templates } = useQuery({
+    queryKey: ["templates"],
+    queryFn: getTemplates,
+  });
+
+  const templatesByCategory = useMemo(() => {
+    if (!templates) return new Map<string, Template>();
+    const map = new Map<string, Template>();
+    for (const cat of CATEGORIES) {
+      const match = templates.find((t) => t.category === cat.label);
+      if (match) map.set(cat.label, match);
+    }
+    return map;
+  }, [templates]);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* Category strip */}
@@ -166,14 +247,16 @@ export function Landing(): React.ReactElement {
         </p>
       </section>
 
-      {/* Pastel category grid */}
+      {/* Pastel category grid with live previews */}
       <section className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-        {CATEGORIES.map((cat) => (
+        {CATEGORIES.map((cat, index) => (
           <CategoryCard
             key={cat.label}
             label={cat.label}
             color={cat.color}
             sampleTitle={SAMPLE_TITLES[cat.label]}
+            template={templatesByCategory.get(cat.label)}
+            index={index}
             onSelect={() => navigate(cat.to)}
           />
         ))}
