@@ -50,6 +50,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const { logout } = useAuthStore.getState();
+      logout();
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  },
+);
+
 export async function getTemplates(): Promise<Template[]> {
   const { data } = await api.get<Template[]>("/api/templates");
   return data;
@@ -174,6 +186,17 @@ export async function updateEvent(
 
 export async function deleteEvent(eventId: string): Promise<void> {
   await api.delete(`/api/v1/events/${eventId}`);
+}
+
+export async function updateRsvpStatus(
+  token: string,
+  payload: { rsvp_status: "accepted" | "declined"; personal_note?: string },
+): Promise<ParticipantResponse> {
+  const { data } = await api.patch<ParticipantResponse>(
+    `/api/v1/invitation/${token}/rsvp`,
+    payload,
+  );
+  return data;
 }
 
 export async function getInvitationByToken(

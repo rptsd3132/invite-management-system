@@ -81,6 +81,7 @@ export interface ParticipantResponse {
   email: string | null;
   unique_link_token: string;
   rsvp_status: string;
+  personal_note?: string | null;
   created_at: string;
 }
 

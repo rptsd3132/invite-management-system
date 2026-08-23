@@ -1,31 +1,31 @@
 import { useState } from "react";
-import { Copy, Check, ExternalLink, Users } from "lucide-react";
-import { Badge } from "../ui/Badge";
+import { Copy, Check, ExternalLink, Users, MessageSquare } from "lucide-react";
 import type { EventDetailResponse } from "../../types";
 
 interface GuestTableProps {
   event: EventDetailResponse;
 }
 
-function rsvpBadgeVariant(status: string): "success" | "danger" | "muted" {
+function rsvpPill(status: string): React.ReactElement {
   switch (status) {
-    case "confirmed":
-      return "success";
+    case "accepted":
+      return (
+        <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+          Attending
+        </span>
+      );
     case "declined":
-      return "danger";
+      return (
+        <span className="inline-flex rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-medium text-rose-700">
+          Declined
+        </span>
+      );
     default:
-      return "muted";
-  }
-}
-
-function rsvpLabel(status: string): string {
-  switch (status) {
-    case "confirmed":
-      return "Attending";
-    case "declined":
-      return "Declined";
-    default:
-      return "Pending";
+      return (
+        <span className="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-600">
+          Pending
+        </span>
+      );
   }
 }
 
@@ -71,6 +71,9 @@ export function GuestTable({ event }: GuestTableProps): React.ReactElement {
                 RSVP Status
               </th>
               <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-zinc-400">
+                Notes
+              </th>
+              <th className="px-6 py-3.5 text-xs font-medium uppercase tracking-wider text-zinc-400">
                 Actions
               </th>
             </tr>
@@ -107,9 +110,22 @@ export function GuestTable({ event }: GuestTableProps): React.ReactElement {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant={rsvpBadgeVariant(p.rsvp_status)}>
-                    {rsvpLabel(p.rsvp_status)}
-                  </Badge>
+                  {rsvpPill(p.rsvp_status)}
+                </td>
+                <td className="px-6 py-4">
+                  {p.personal_note ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs text-zinc-500"
+                      title={p.personal_note}
+                    >
+                      <MessageSquare className="h-3.5 w-3.5 text-zinc-400" />
+                      <span className="max-w-[150px] truncate">
+                        {p.personal_note}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-300">—</span>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   <a

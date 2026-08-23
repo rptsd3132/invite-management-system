@@ -1,4 +1,4 @@
-import { Users, UserCheck, UserX, MapPin, Calendar } from "lucide-react";
+import { Users, UserCheck, UserX, Clock, MapPin, Calendar } from "lucide-react";
 import type { EventDetailResponse } from "../../types";
 
 interface EventOverviewProps {
@@ -14,12 +14,13 @@ function StatCard({
   label: string;
   value: number;
   icon: React.ElementType;
-  accent: "violet" | "emerald" | "red";
+  accent: "violet" | "emerald" | "red" | "stone";
 }): React.ReactElement {
   const accentStyles = {
     violet: "bg-violet-50 text-violet-600",
     emerald: "bg-emerald-50 text-emerald-600",
     red: "bg-red-50 text-red-600",
+    stone: "bg-stone-100 text-stone-600",
   };
 
   return (
@@ -42,12 +43,13 @@ function StatCard({
 export function EventOverview({ event }: EventOverviewProps): React.ReactElement {
   const participants = event.participants ?? [];
   const totalInvited = participants.length;
-  const attending = participants.filter((p) => p.rsvp_status === "confirmed").length;
+  const attending = participants.filter((p) => p.rsvp_status === "accepted").length;
   const declined = participants.filter((p) => p.rsvp_status === "declined").length;
+  const pending = participants.filter((p) => p.rsvp_status === "pending").length;
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Invited"
           value={totalInvited}
@@ -65,6 +67,12 @@ export function EventOverview({ event }: EventOverviewProps): React.ReactElement
           value={declined}
           icon={UserX}
           accent="red"
+        />
+        <StatCard
+          label="Pending"
+          value={pending}
+          icon={Clock}
+          accent="stone"
         />
       </div>
 

@@ -50,3 +50,19 @@ async def delete_participant(
     await db.delete(participant)
     await db.commit()
     return True
+
+
+async def update_rsvp_status(
+    db: AsyncSession,
+    token: uuid.UUID,
+    rsvp_status: str,
+    personal_note: str | None = None,
+) -> Participant | None:
+    participant = await get_participant_by_token(db, token)
+    if participant is None:
+        return None
+    participant.rsvp_status = rsvp_status
+    participant.personal_note = personal_note
+    await db.commit()
+    await db.refresh(participant)
+    return participant

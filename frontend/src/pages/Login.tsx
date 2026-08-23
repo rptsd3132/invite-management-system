@@ -24,24 +24,18 @@ export function Login(): React.ReactElement {
 
   const emailMutation = useMutation({
     mutationFn: loginWithEmailApi,
-   onSuccess: (data) => {
-  localStorage.setItem("token", data.access_token);
-
-  login(data.user, data);
-
-  navigate(from, { replace: true });
-},
+    onSuccess: (data) => {
+      login(data.user, data);
+      navigate(from, { replace: true });
+    },
   });
 
   const googleMutation = useMutation({
     mutationFn: loginWithGoogleAccessToken,
     onSuccess: (data) => {
-  localStorage.setItem("token", data.access_token);
-
-  login(data.user, data);
-
-  navigate(from, { replace: true });
-},
+      login(data.user, data);
+      navigate(from, { replace: true });
+    },
   });
 
   const onSubmit = (data: SignInFormData): void => {
