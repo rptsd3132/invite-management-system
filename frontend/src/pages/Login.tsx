@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,8 @@ import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 
 export function Login(): React.ReactElement {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from ?? "/dashboard";
   const login = useAuthStore((s) => s.login);
 
   const {
@@ -27,9 +29,7 @@ export function Login(): React.ReactElement {
 
   login(data.user, data);
 
-  navigate("/dashboard", {
-    replace: true,
-  });
+  navigate(from, { replace: true });
 },
   });
 
@@ -40,9 +40,7 @@ export function Login(): React.ReactElement {
 
   login(data.user, data);
 
-  navigate("/dashboard", {
-    replace: true,
-  });
+  navigate(from, { replace: true });
 },
   });
 

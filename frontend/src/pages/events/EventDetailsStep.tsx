@@ -20,6 +20,36 @@ interface NominatimResult {
   display_name: string;
 }
 
+interface NominatimReverseResult {
+  display_name?: string;
+  address?: {
+    amenity?: string;
+    building?: string;
+    tourism?: string;
+    road?: string;
+    suburb?: string;
+    city?: string;
+    town?: string;
+    village?: string;
+  };
+}
+
+function formatConciseLocation(data: NominatimReverseResult): string {
+  const addr = data.address ?? {};
+  const primary = addr.amenity ?? addr.building ?? addr.tourism ?? addr.road ?? addr.suburb ?? "";
+  const secondary = addr.city ?? addr.town ?? addr.village ?? "";
+
+  let combined = primary;
+  if (primary && secondary && primary !== secondary) {
+    combined = `${primary}, ${secondary}`;
+  } else if (!combined) {
+    combined = data.display_name?.split(",")[0] ?? "";
+  }
+
+  const words = combined.replace(/,/g, "").trim().split(/\s+/);
+  return words.slice(0, 3).join(" ");
+}
+
 interface Props {
   state: WizardState;
   dispatch: React.Dispatch<WizardAction>;
@@ -123,10 +153,10 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("Reverse geocoding failed");
-        const data = (await response.json()) as { display_name?: string };
+        const data = (await response.json()) as NominatimReverseResult;
         if (sequence !== reverseGeocodingSeqRef.current) return;
         isManualUpdateRef.current = true;
-        dispatch({ type: "SET_EVENT_DATA", payload: { location: data.display_name ?? fallbackAddress } });
+        dispatch({ type: "SET_EVENT_DATA", payload: { location: formatConciseLocation(data) || fallbackAddress } });
       })
       .catch(() => {
         if (sequence !== reverseGeocodingSeqRef.current) return;

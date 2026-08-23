@@ -1,11 +1,12 @@
-import { useCallback, useReducer } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useCallback, useEffect } from "react";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { EventDetailsStep } from "./EventDetailsStep";
 import { TemplateSelectionStep } from "./TemplateSelectionStep";
 import { GuestListStep } from "./GuestListStep";
 import { ReviewConfirmStep } from "./ReviewConfirmStep";
 import { StepIndicator } from "../../components/events/StepIndicator";
-import type { InvitationLanguage } from "../../lib/invitationLanguage";
+import { useEventStore } from "../../store/useEventStore";
+import { useAuthStore } from "../../store/authStore";
 
 export interface WizardState {
   eventData: {
@@ -13,7 +14,7 @@ export interface WizardState {
     location: string;
     eventDate: string;
     category: string;
-    language: InvitationLanguage;
+    language: string;
     metadata: Record<string, string>;
     latitude: number | null;
     longitude: number | null;
@@ -30,66 +31,56 @@ export type WizardAction =
   | { type: "RESET" };
 
 const STEP_LABELS = ["Choose Template", "Event Details", "Guests", "Review"];
-
-const initialState: WizardState = {
-  eventData: {
-    eventName: "",
-    location: "",
-    eventDate: "",
-    category: "Wedding",
-    language: "en",
-    metadata: {},
-    latitude: null,
-    longitude: null,
-  },
-  selectedTemplateId: null,
-  guests: [],
-};
-
-function reducer(state: WizardState, action: WizardAction): WizardState {
-  switch (action.type) {
-    case "SET_EVENT_DATA":
-      return {
-        ...state,
-        eventData: { ...state.eventData, ...action.payload },
-      };
-    case "SET_TEMPLATE":
-      return { ...state, selectedTemplateId: action.payload };
-    case "ADD_GUESTS":
-      return {
-        ...state,
-        guests: [...state.guests, ...action.payload],
-      };
-    case "REMOVE_GUEST":
-      return {
-        ...state,
-        guests: state.guests.filter((_, i) => i !== action.payload),
-      };
-    case "RESET":
-      return initialState;
-    default:
-      return state;
-  }
-}
-
 const TOTAL_STEPS = 4;
-
-function initReducer(searchParams: URLSearchParams): WizardState {
-  const templateId = searchParams.get("templateId");
-  return {
-    ...initialState,
-    selectedTemplateId: templateId,
-  };
-}
 
 export function CreateEventWizard(): React.ReactElement {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedStep = parseInt(searchParams.get("step") ?? "1", 10);
-  const [state, dispatch] = useReducer(reducer, searchParams, initReducer);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
-  const step =
-    requestedStep > 1 && !state.selectedTemplateId ? 1 : Math.min(Math.max(requestedStep, 1), TOTAL_STEPS);
+  const {
+    eventData,
+    selectedTemplateId,
+    guests,
+    setEventData,
+    setTemplate,
+    addGuests,
+    removeGuest,
+    reset,
+  } = useEventStore();
+
+  const state: WizardState = { eventData, selectedTemplateId, guests };
+
+  const dispatch = useCallback(
+    (action: WizardAction) => {
+      switch (action.type) {
+        case "SET_EVENT_DATA":
+          setEventData(action.payload);
+          break;
+        case "SET_TEMPLATE":
+          setTemplate(action.payload);
+          break;
+        case "ADD_GUESTS":
+          addGuests(action.payload);
+          break;
+        case "REMOVE_GUEST":
+          removeGuest(action.payload);
+          break;
+        case "RESET":
+          reset();
+          break;
+      }
+    },
+    [setEventData, setTemplate, addGuests, removeGuest, reset],
+  );
+
+  useEffect(() => {
+    const templateId = searchParams.get("templateId");
+    if (templateId && !selectedTemplateId) {
+      setTemplate(templateId);
+    }
+  }, [searchParams, selectedTemplateId, setTemplate]);
 
   const goToStep = useCallback(
     (s: number) => {
@@ -100,8 +91,24 @@ export function CreateEventWizard(): React.ReactElement {
   );
 
   const handleFinish = useCallback(() => {
+    reset();
     navigate("/dashboard");
-  }, [navigate]);
+  }, [reset, navigate]);
+
+  const step =
+    requestedStep > 1 && !selectedTemplateId
+      ? 1
+      : Math.min(Math.max(requestedStep, 1), TOTAL_STEPS);
+
+  if (step >= 3 && !isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: `/events/create?step=${step}` }}
+        replace
+      />
+    );
+  }
 
   const stepProps = { state, dispatch, goToStep, handleFinish };
 

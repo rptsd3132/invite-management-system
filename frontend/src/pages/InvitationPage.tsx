@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, MapPin } from "lucide-react";
 import { getInvitationByToken } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
-import { MapModal } from "../components/events/MapModal";
 
 import {
   formatInvitationDate,
@@ -15,8 +14,6 @@ import {
 
 export function InvitationPage(): React.ReactElement {
   const { token } = useParams<{ token: string }>();
-
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   const {
     data,
@@ -161,26 +158,19 @@ export function InvitationPage(): React.ReactElement {
           </div>
         )}
 
-        {event.latitude != null && event.longitude != null && (
-          <>
-            <button
-              type="button"
-              onClick={() => setIsMapModalOpen(true)}
-              className="mt-8 inline-flex max-w-full items-center justify-center gap-2 text-sm font-medium text-neutral-700 transition-colors hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 focus-visible:ring-offset-2"
-            >
-              <MapPin className="h-4 w-4 shrink-0" />
-              <span className="truncate">{event.location}</span>
-            </button>
-
-            <MapModal
-              isOpen={isMapModalOpen}
-              onClose={() => setIsMapModalOpen(false)}
-              latitude={event.latitude}
-              longitude={event.longitude}
-              address={event.location}
-            />
-          </>
-        )}
+        <a
+          href={
+            event.latitude != null && event.longitude != null
+              ? `https://www.google.com/maps/dir/?api=1&destination=${event.latitude},${event.longitude}`
+              : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address || event.location)}`
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-8 flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-all duration-200 shadow-md hover:shadow-lg"
+        >
+          <MapPin className="h-4 w-4 shrink-0" />
+          Get Directions
+        </a>
 
         <p className="mt-12 text-xs text-neutral-400">
           {copy.poweredBy}
