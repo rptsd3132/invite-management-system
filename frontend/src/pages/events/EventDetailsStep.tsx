@@ -219,7 +219,7 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
         </div>
         <div>
           <label className="block text-sm font-medium text-neutral-700">{copy.eventName}</label>
-          <input type="text" value={eventData.eventName} onChange={(e) => updateField("eventName", e.target.value)} className={inputClass} placeholder={language === "si" ? "උදා: වාර්ෂික නවෝත්පාදන සමුළුව 2026" : "e.g. Annual Innovation Summit 2026"} />
+          <input type="text" value={eventData.eventName} onChange={(e) => updateField("eventName", e.target.value)} className={inputClass} placeholder={language === "si" ? "උදා: ජෝන්ගේ 30 වන උපන්දින සාදය" : "e.g., John's 30th Birthday Party"} />
           {errors.eventName && <p className="mt-1 text-sm text-red-600">{errors.eventName}</p>}
         </div>
         <div>
@@ -230,7 +230,7 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
               value={eventData.location}
               onChange={(e) => updateField("location", e.target.value)}
               className={[inputClass, isReverseGeocoding ? "pr-10" : ""].join(" ")}
-              placeholder={isReverseGeocoding ? (language === "si" ? "ලිපිනය සොයමින්..." : "Fetching address...") : (language === "si" ? "උදා: ප්‍රධාන සම්මන්ත්‍රණ ශාලාව" : "e.g. Convention Center")}
+              placeholder={isReverseGeocoding ? (language === "si" ? "ලිපිනය සොයමින්..." : "Fetching address...") : (language === "si" ? "උදා: හිල්ටන් කොළඹ මහා ශාලාව" : "e.g., Grand Ballroom, Hilton Colombo")}
             />
             {isReverseGeocoding && (
               <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-brand" />
@@ -262,9 +262,13 @@ export function EventDetailsStep({ state, dispatch, goToStep }: Props): React.Re
             }}
             className={inputClass}
           >
+            <option value="" disabled>
+              {language === "si" ? "උප වර්ගය තෝරන්න..." : "Select the event category..."}
+            </option>
             <option value="Wedding">{categoryLabel("Wedding", language)}</option>
-            <option value="Office">{categoryLabel("Office", language)}</option>
             <option value="Birthday">{categoryLabel("Birthday", language)}</option>
+            <option value="Party">{language === "si" ? "සාදය" : "Party"}</option>
+            <option value="Office">{language === "si" ? "ආයතනික" : "Corporate"}</option>
           </select>
         </div>
         {extraFields.map((field) => (

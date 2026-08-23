@@ -76,3 +76,7 @@ export const useEventStore = create<EventWizardState & EventWizardActions>()(
     },
   ),
 );
+
+export function resetEventState(): void {
+  useEventStore.getState().reset();
+}

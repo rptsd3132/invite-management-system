@@ -1,27 +1,17 @@
-import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  Check,
-  CheckCircle,
-  Clipboard,
-  ExternalLink,
-  Loader2,
-  Save,
-} from "lucide-react";
-import { createEvent, addParticipants, createTemplate } from "../../lib/api";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { createEvent, addParticipants } from "../../lib/api";
+import { resetEventState } from "../../store/useEventStore";
 import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
 import { Button } from "../../components/ui/Button";
-import { Input } from "../../components/ui/Input";
 import { useAllTemplates } from "../../hooks/useAllTemplates";
 import {
   formatInvitationDate,
   getInvitationCopy,
 } from "../../lib/invitationLanguage";
-import type {
-  CreateTemplatePayload,
-  EventResponse,
-  ParticipantResponse,
-} from "../../types";
+import type { EventResponse, ParticipantResponse } from "../../types";
 import type { WizardAction, WizardState } from "./CreateEventWizard";
 
 interface Props {
@@ -31,26 +21,10 @@ interface Props {
   handleFinish: () => void;
 }
 
-function getInvitationUrl(token: string): string {
-  return `${window.location.origin}/invitation/${token}`;
-}
-
-export function ReviewConfirmStep({ state, goToStep, handleFinish }: Props): React.ReactElement {
+export function ReviewConfirmStep({ state, goToStep }: Props): React.ReactElement {
   const language = state.eventData.language;
   const copy = getInvitationCopy(language);
-
-  const [createdEvent, setCreatedEvent] = useState<EventResponse | null>(null);
-  const [createdParticipants, setCreatedParticipants] = useState<
-    ParticipantResponse[]
-  >([]);
-  const [copiedToken, setCopiedToken] = useState<string | null>(null);
-  const [saveOpen, setSaveOpen] = useState(false);
-  const [templateName, setTemplateName] = useState("");
-  const [templateCategory, setTemplateCategory] = useState(
-    state.eventData.category,
-  );
-  const [savedTemplateId, setSavedTemplateId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { templates, isLoading: templatesLoading } = useAllTemplates();
 
@@ -140,42 +114,13 @@ export function ReviewConfirmStep({ state, goToStep, handleFinish }: Props): Rea
       return { event, participants };
     },
     onSuccess: ({ event, participants }) => {
-      setCreatedEvent(event);
-      setCreatedParticipants(participants);
+      resetEventState();
+      navigate("/success", {
+        replace: true,
+        state: { event, participants },
+      });
     },
   });
-
-  const saveTemplateMutation = useMutation({
-    mutationFn: (payload: CreateTemplatePayload) => createTemplate(payload),
-    onSuccess: (saved) => {
-      setSavedTemplateId(saved.id);
-      setSaveOpen(false);
-      void queryClient.invalidateQueries({ queryKey: ["templates"] });
-      void queryClient.invalidateQueries({ queryKey: ["my-templates"] });
-    },
-  });
-
-  function handleSaveTemplate(): void {
-    if (!template || !templateName.trim()) return;
-    saveTemplateMutation.mutate({
-      name: templateName.trim(),
-      category: templateCategory.trim() || state.eventData.category,
-      design_schema: template.design_schema,
-    });
-  }
-
-  async function handleCopy(token: string): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(getInvitationUrl(token));
-      setCopiedToken(token);
-      window.setTimeout(
-        () => setCopiedToken((current) => (current === token ? null : current)),
-        2000,
-      );
-    } catch {
-      // Clipboard API unavailable; ignore.
-    }
-  }
 
   if (templatesLoading) {
     return (
@@ -284,184 +229,22 @@ export function ReviewConfirmStep({ state, goToStep, handleFinish }: Props): Rea
         </p>
       )}
 
-      {mutation.isSuccess && createdEvent && (
-        <div className="mt-8 space-y-4">
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-            <p className="font-medium text-emerald-700">
-              Event created successfully! Copy each guest&apos;s personalized link below.
-            </p>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm shadow-zinc-900/5">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-zinc-100 text-left text-xs uppercase tracking-wide text-zinc-400">
-                    <th className="px-4 py-3 font-semibold">Guest</th>
-                    <th className="px-4 py-3 font-semibold">Contact</th>
-                    <th className="px-4 py-3 font-semibold">Personalized Link</th>
-                    <th className="px-4 py-3 font-semibold text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {createdParticipants.map((p) => {
-                    const url = getInvitationUrl(p.unique_link_token);
-                    const isCopied = copiedToken === p.unique_link_token;
-                    return (
-                      <tr key={p.id} className="border-b border-zinc-100 last:border-0">
-                        <td className="px-4 py-3 font-medium text-zinc-800">
-                          {p.guest_name}
-                        </td>
-                        <td className="px-4 py-3 text-zinc-500">
-                          {p.email ?? "—"}
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            readOnly
-                            value={url}
-                            onFocus={(e) => e.currentTarget.select()}
-                            className="w-full min-w-64 rounded-lg border border-zinc-200 bg-zinc-50/50 px-3 py-2 font-mono text-xs text-zinc-600 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
-                          />
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => void handleCopy(p.unique_link_token)}
-                              title="Copy link"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-50"
-                            >
-                              {isCopied ? (
-                                <Check className="h-4 w-4 text-emerald-600" />
-                              ) : (
-                                <Clipboard className="h-4 w-4" />
-                              )}
-                            </button>
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noreferrer"
-                              title="Open invitation"
-                              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-50"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-sm shadow-zinc-900/5">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h3 className="text-sm font-semibold text-zinc-700">
-                  Save this design as a template
-                </h3>
-                <p className="mt-1 text-sm text-zinc-500">
-                  Reuse this invitation design for future events.
-                </p>
-              </div>
-              {!saveOpen && !savedTemplateId && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setSaveOpen(true)}
-                >
-                  <Save className="h-4 w-4" />
-                  Save as Template
-                </Button>
-              )}
-            </div>
-
-            {savedTemplateId && (
-              <p className="mt-3 flex items-center gap-1.5 text-sm text-emerald-700">
-                <CheckCircle className="h-4 w-4 shrink-0" />
-                Template saved! You can pick it when creating a new event.
-              </p>
-            )}
-
-            {saveTemplateMutation.isError && (
-              <p className="mt-3 text-sm text-red-600">
-                {(saveTemplateMutation.error as Error)?.message ??
-                  "Failed to save template."}
-              </p>
-            )}
-
-            {saveOpen && (
-              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Input
-                  label="Template name"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder={`${template?.name ?? "My"} design`}
-                />
-                <Input
-                  label="Category"
-                  value={templateCategory}
-                  onChange={(e) => setTemplateCategory(e.target.value)}
-                />
-                <div className="flex justify-end gap-2 sm:col-span-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setSaveOpen(false);
-                      setSavedTemplateId(null);
-                    }}
-                    disabled={saveTemplateMutation.isPending}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleSaveTemplate}
-                    disabled={
-                      saveTemplateMutation.isPending || !templateName.trim()
-                    }
-                  >
-                    {saveTemplateMutation.isPending && (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    )}
-                    {saveTemplateMutation.isPending
-                      ? "Saving..."
-                      : "Save Template"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div className="flex justify-between pt-8">
         <Button
           type="button"
           variant="outline"
           onClick={() => goToStep(3)}
-          disabled={mutation.isSuccess}
         >
           Back
         </Button>
-        {mutation.isSuccess ? (
-          <Button type="button" onClick={handleFinish}>
-            <Check className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mutation.isPending ? "Creating..." : "Create Event & Invitations"}
-          </Button>
-        )}
+        <Button
+          type="button"
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+        >
+          {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          {mutation.isPending ? "Creating..." : "Create Event & Invitations"}
+        </Button>
       </div>
     </div>
   );

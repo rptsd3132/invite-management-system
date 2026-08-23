@@ -95,6 +95,12 @@ export function Navbar(): React.ReactElement {
                   New Event
                 </Button>
               </Link>
+              <Link to="/organizer">
+                <Button variant="outline" size="sm" className="ml-1">
+                  <LayoutDashboard className="h-3.5 w-3.5" />
+                  Manage Events
+                </Button>
+              </Link>
             </div>
           )}
         </div>

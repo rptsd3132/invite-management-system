@@ -1,8 +1,10 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, LayoutDashboard, Search, Sparkles } from "lucide-react";
 import { getTemplates } from "../lib/api";
+import { useAuthStore } from "../store/authStore";
+import { Button } from "../components/ui/Button";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
@@ -193,6 +195,7 @@ function AIPremiumBanner(): React.ReactElement {
 
 export function Landing(): React.ReactElement {
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const { data: templates } = useQuery({
     queryKey: ["templates"],
@@ -245,6 +248,14 @@ export function Landing(): React.ReactElement {
           Design beautiful invitations for every occasion — weddings, birthdays,
           parties and more. Pick a style, add your details, and share the magic.
         </p>
+        {isAuthenticated && (
+          <Link to="/organizer">
+            <Button className="mt-8">
+              <LayoutDashboard className="h-4 w-4" />
+              Manage Events
+            </Button>
+          </Link>
+        )}
       </section>
 
       {/* Pastel category grid with live previews */}

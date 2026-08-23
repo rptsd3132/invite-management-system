@@ -42,3 +42,15 @@ async def get_event_by_id(
         .options(selectinload(Event.participants))
     )
     return result.scalar_one_or_none()
+
+
+async def delete_event(
+    db: AsyncSession,
+    event_id: uuid.UUID,
+) -> bool:
+    event = await db.get(Event, event_id)
+    if event is None:
+        return False
+    await db.delete(event)
+    await db.commit()
+    return True

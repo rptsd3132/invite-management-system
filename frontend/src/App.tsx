@@ -10,6 +10,8 @@ import { EventDetail } from "./pages/EventDetail";
 import { InvitationPage } from "./pages/InvitationPage";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { OrganizerDashboard } from "./pages/OrganizerDashboard";
+import { EventSuccess } from "./pages/EventSuccess";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,6 +34,8 @@ function App(): React.ReactElement {
             <Route path="/templates/:id" element={<TemplateDetail />} />
             <Route path="/create-event" element={<Navigate to="/events/create" replace />} />
             <Route path="/events/create" element={<CreateEventWizard />} />
+            <Route path="/organizer" element={<OrganizerDashboard />} />
+            <Route path="/success" element={<EventSuccess />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

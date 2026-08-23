@@ -161,6 +161,21 @@ export async function addParticipants(
   return data;
 }
 
+export async function updateEvent(
+  eventId: string,
+  payload: Partial<CreateEventPayload>,
+): Promise<EventResponse> {
+  const { data } = await api.patch<EventResponse>(
+    `/api/v1/events/${eventId}`,
+    payload,
+  );
+  return data;
+}
+
+export async function deleteEvent(eventId: string): Promise<void> {
+  await api.delete(`/api/v1/events/${eventId}`);
+}
+
 export async function getInvitationByToken(
   token: string,
 ): Promise<InvitationResponse> {
