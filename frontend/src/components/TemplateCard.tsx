@@ -1,7 +1,13 @@
 import type { ReactElement } from "react";
 
 import { cn } from "../lib/utils";
+<<<<<<< HEAD
 import { resolveTemplateImage } from "./assets/templateImages";
+=======
+import { resolveTemplateImage } from "./templates/templateImages";
+import { TemplateRenderer } from "./ui/TemplateRenderer";
+import type { Template } from "../types";
+>>>>>>> de10346 (Backup before new invitation template system)
 
 interface TemplateCardProps {
   category: string;
