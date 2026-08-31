@@ -11,7 +11,7 @@ import type {
 } from "react";
 
 import { cn } from "../../lib/utils";
-import { resolveTemplateImage } from "../templates/templateImages";
+import { resolveTemplateImage } from "../assets/templateImages";
 import type { InvitationLanguage } from "../../lib/invitationLanguage";
 
 import {
