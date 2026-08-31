@@ -114,11 +114,7 @@ export function Navbar(): React.ReactElement {
               )}
             >
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 text-xs font-semibold text-white">
-               {initialsOf(
-  user.first_name ?? null,
-  user.last_name ?? null,
-  user.email ?? null,
-)}
+                {initialsOf(user.first_name, user.last_name, user.email)}
               </span>
               <span className="hidden max-w-40 truncate text-sm text-zinc-600 sm:block">
                 {user.email}

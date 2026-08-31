@@ -16,7 +16,7 @@ from app.models import Event, Participant, Template, User  # noqa: F401
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    # Create database tables that do not already exist.
+    # Create tables that do not already exist.
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.create_all)
 
@@ -39,17 +39,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+<<<<<<< HEAD
+origins = [
+=======
 
 # Frontend URLs allowed to access the backend API.
 allowed_origins = [
+>>>>>>> main
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-
-    "http://localhost:5175",
-    "http://127.0.0.1:5175",
 ]
 
 

@@ -1,30 +1,20 @@
 import { useMemo, useState } from "react";
-
-import { TemplateCard } from "../../components/TemplateCard";
+<<<<<<< HEAD
+import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
+import { Button } from "../../components/ui/Button";
 import { useAllTemplates } from "../../hooks/useAllTemplates";
+import { cn } from "../../lib/utils";
+import type { WizardAction, WizardState } from "./CreateEventWizard";
+=======
+import { useQuery } from "@tanstack/react-query";
 
-/* =========================================================
-   ACTUAL INVITATION TEMPLATES
-========================================================= */
+import { getTemplates } from "../../lib/api";
+import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
+import { TemplateCard } from "../../components/TemplateCard";
 
-import WeddingInvitationTemplate from "../../components/templates/wedding/WeddingInvitationTemplate";
-import SinhalaWeddingTemplate from "../../components/templates/wedding/SinhalaWeddingTemplate";
-
-import BirthdayInvitationTemplate from "../../components/templates/birthday/BirthdayInvitationTemplate";
-import SinhalaBirthdayTemplate from "../../components/templates/birthday/SinhalaBirthdayTemplate";
-
-import OfficeInvitationTemplate from "../../components/templates/office/OfficeInvitationTemplate";
-import SinhalaOfficeInvitationTemplate from "../../components/templates/office/SinhalaOfficeInvitationTemplate";
-
-import type {
-  WizardAction,
-  WizardState,
-} from "./CreateEventWizard";
-
-import {
-  getInvitationCopy,
-} from "../../lib/invitationLanguage";
-
+import type { WizardState } from "./CreateEventWizard";
+import { formatInvitationDate, getInvitationCopy } from "../../lib/invitationLanguage";
+>>>>>>> main
 
 interface Props {
   state: WizardState;
@@ -32,338 +22,89 @@ interface Props {
   goToStep: (step: number) => void;
 }
 
-
-/* =========================================================
-   ONLY OUR SIX NEW TEMPLATES
-========================================================= */
-
-const ACTIVE_TEMPLATE_NAMES = [
-  "English Wedding",
-  "Sinhala Wedding",
-  "English Birthday",
-  "Sinhala Birthday",
-  "English Office",
-  "Sinhala Office",
-];
-
-
-/* =========================================================
-   ACTUAL TEMPLATE PREVIEW
-========================================================= */
-
-function ActualTemplatePreview({
-  templateName,
-  state,
-}: {
-  templateName: string;
-  state: WizardState;
-}): React.ReactElement {
-  const metadata =
-    state.eventData.metadata ?? {};
-
-  const eventName =
-    state.eventData.eventName || "";
-
-  const location =
-    state.eventData.location || "";
-
-  const date =
-    state.eventData.eventDate || "";
-
-
-  /* =====================================================
-     WEDDING - ENGLISH
-  ====================================================== */
-
-  if (
-    templateName ===
-    "English Wedding"
-  ) {
-    return (
-      <WeddingInvitationTemplate
-        eventName={eventName}
-        location={location}
-        date={date}
-        category="Wedding"
-        language="en"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     WEDDING - SINHALA
-  ====================================================== */
-
-  if (
-    templateName ===
-    "Sinhala Wedding"
-  ) {
-    return (
-      <SinhalaWeddingTemplate
-        eventName={eventName}
-        location={location}
-        date={date}
-        category="Wedding"
-        language="si"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     BIRTHDAY - ENGLISH
-  ====================================================== */
-
-  if (
-    templateName ===
-    "English Birthday"
-  ) {
-    return (
-      <BirthdayInvitationTemplate
-        eventName={eventName}
-        birthdayPerson={
-          metadata.birthday_person_name ||
-          metadata.birthday_person ||
-          metadata.birthdayPerson ||
-          eventName
-        }
-        age={
-          metadata.age || ""
-        }
-        location={location}
-        date={date}
-        category="Birthday"
-        language="en"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     BIRTHDAY - SINHALA
-  ====================================================== */
-
-  if (
-    templateName ===
-    "Sinhala Birthday"
-  ) {
-    return (
-      <SinhalaBirthdayTemplate
-        eventName={eventName}
-        birthdayPerson={
-          metadata.birthday_person_name ||
-          metadata.birthday_person ||
-          metadata.birthdayPerson ||
-          eventName
-        }
-        age={
-          metadata.age || ""
-        }
-        location={location}
-        date={date}
-        category="Birthday"
-        language="si"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     OFFICE - ENGLISH
-  ====================================================== */
-
-  if (
-    templateName ===
-    "English Office"
-  ) {
-    return (
-      <OfficeInvitationTemplate
-        eventName={eventName}
-        companyName={
-          metadata.company_name ||
-          metadata.companyName ||
-          ""
-        }
-        location={location}
-        date={date}
-        category="Technology"
-        language="en"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     OFFICE - SINHALA
-  ====================================================== */
-
-  if (
-    templateName ===
-    "Sinhala Office"
-  ) {
-    return (
-      <SinhalaOfficeInvitationTemplate
-        eventName={eventName}
-        companyName={
-          metadata.company_name ||
-          metadata.companyName ||
-          ""
-        }
-        location={location}
-        date={date}
-        category="Office"
-        language="si"
-      />
-    );
-  }
-
-
-  /* =====================================================
-     FALLBACK
-  ====================================================== */
-
-  return (
-    <div className="flex min-h-[420px] items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 p-8 text-center">
-      <div>
-        <p className="font-semibold text-neutral-800">
-          Preview unavailable
-        </p>
-
-        <p className="mt-2 text-sm text-neutral-500">
-          {templateName}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-
-/* =========================================================
-   TEMPLATE SELECTION STEP
-========================================================= */
-
+<<<<<<< HEAD
+export function TemplateSelectionStep({ state, dispatch, goToStep }: Props): React.ReactElement {
+  const { templates, isLoading } = useAllTemplates();
+=======
 export function TemplateSelectionStep({
   state,
   dispatch,
   goToStep,
 }: Props): React.ReactElement {
-  const {
-    templates,
-    isLoading,
-  } = useAllTemplates();
+  const { data: templates, isLoading } = useQuery({
+    queryKey: ["templates"],
+    queryFn: getTemplates,
+  });
+>>>>>>> main
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const copy =
-    getInvitationCopy(
-      state.eventData.language,
+  const filtered = useMemo(() => {
+    return (templates ?? []).filter(
+      (template) => template.category === state.eventData.category,
     );
+  }, [templates, state.eventData.category]);
 
+  const weddingCount = useMemo(() => {
+    return (templates ?? []).filter(
+      (template) => template.category === "Wedding",
+    ).length;
+  }, [templates]);
 
-  /* =====================================================
-     REMOVE OLD TEMPLATES
-  ====================================================== */
+  const birthdayCount = useMemo(() => {
+    return (templates ?? []).filter(
+      (template) => template.category === "Birthday",
+    ).length;
+  }, [templates]);
 
-  const activeTemplates =
+  const officeCount = useMemo(() => {
+    return (templates ?? []).filter(
+      (template) => template.category === "Office",
+    ).length;
+  }, [templates]);
+
+  const selectedTemplate = useMemo(() => {
+    return templates?.find(
+      (template) => template.id === state.selectedTemplateId,
+    );
+  }, [templates, state.selectedTemplateId]);
+
+  const previewFieldData: Record<string, string | undefined> =
     useMemo(() => {
-      return (
-        templates ?? []
-      ).filter(
-        (template) =>
-          ACTIVE_TEMPLATE_NAMES.includes(
-            template.name,
-          ),
-      );
-    }, [
-      templates,
-    ]);
+      if (!selectedTemplate) return {};
 
+      const data: Record<string, string | undefined> = {};
 
-  /* =====================================================
-     CURRENT CATEGORY TEMPLATES
-  ====================================================== */
+      for (const field of selectedTemplate.design_schema.required_fields) {
+        if (field === "event_name") {
+          data[field] = state.eventData.eventName || undefined;
+        } else if (
+          field === "event_location" ||
+          field === "location"
+        ) {
+          data[field] = state.eventData.location || undefined;
+        } else if (
+          field === "event_date_time" ||
+          field === "event_date"
+        ) {
+          data[field] = state.eventData.eventDate
+            ? formatInvitationDate(
+                state.eventData.eventDate,
+                state.eventData.language,
+              )
+            : undefined;
+        } else if (field === "participant_name") {
+          data[field] = getInvitationCopy(state.eventData.language).guest;
+        } else {
+          data[field] =
+            state.eventData.metadata?.[field] || undefined;
+        }
+      }
 
-  const filtered =
-    useMemo(() => {
-      return activeTemplates.filter(
-        (template) =>
-          template.category ===
-          state.eventData.category,
-      );
-    }, [
-      activeTemplates,
-      state.eventData.category,
-    ]);
+      return data;
+    }, [selectedTemplate, state.eventData]);
 
-
-  /* =====================================================
-     COUNTS
-  ====================================================== */
-
-  const weddingCount =
-    useMemo(() => {
-      return activeTemplates.filter(
-        (template) =>
-          template.category ===
-          "Wedding",
-      ).length;
-    }, [
-      activeTemplates,
-    ]);
-
-
-  const birthdayCount =
-    useMemo(() => {
-      return activeTemplates.filter(
-        (template) =>
-          template.category ===
-          "Birthday",
-      ).length;
-    }, [
-      activeTemplates,
-    ]);
-
-
-  const officeCount =
-    useMemo(() => {
-      return activeTemplates.filter(
-        (template) =>
-          template.category ===
-          "Office",
-      ).length;
-    }, [
-      activeTemplates,
-    ]);
-
-
-  /* =====================================================
-     SELECTED TEMPLATE
-  ====================================================== */
-
-  const selectedTemplate =
-    useMemo(() => {
-      return activeTemplates.find(
-        (template) =>
-          template.id ===
-          state.selectedTemplateId,
-      );
-    }, [
-      activeTemplates,
-      state.selectedTemplateId,
-    ]);
-
-
-  /* =====================================================
-     SELECT TEMPLATE
-  ====================================================== */
-
-  const handleSelect = (
-    id: string,
-  ): void => {
+  const handleSelect = (id: string): void => {
     dispatch({
       type: "SET_TEMPLATE",
       payload: id,
@@ -372,50 +113,91 @@ export function TemplateSelectionStep({
     setError("");
   };
 
+  const handleNext = (): void => {
+    if (!state.selectedTemplateId) {
+      setError("Please select a template to continue.");
+      return;
+    }
 
-  /* =====================================================
-     NEXT
-  ====================================================== */
-
-  const handleNext =
-    (): void => {
-      if (
-        !state.selectedTemplateId
-      ) {
-        setError(
-          state.eventData.language === "si"
-            ? "ඉදිරියට යාමට ආරාධනා පත්‍රයක් තෝරන්න."
-            : "Please select a template to continue.",
-        );
-
-        return;
-      }
-
-      goToStep(3);
-    };
-
+    goToStep(3);
+  };
 
   return (
-    <div
-      className="mx-auto w-full max-w-[1500px]"
-      lang={
-        state.eventData.language === "si"
-          ? "si"
-          : "en"
-      }
-    >
+<<<<<<< HEAD
+    <div>
+      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">Choose a Template</h2>
+      <p className="mt-1 text-sm text-zinc-500">
+        Pick an invitation design for your {state.eventData.category} event.
+      </p>
 
-      {/* =================================================
-          HEADER
-      ================================================== */}
+      {isLoading && (
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="aspect-[3/4] rounded-xl bg-zinc-100 animate-pulse" />
+          ))}
+        </div>
+      )}
 
+      {!isLoading && (
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filtered.map((tpl) => (
+            <button
+              key={tpl.id}
+              type="button"
+              onClick={() => handleSelect(tpl.id)}
+              className={cn(
+                "text-left rounded-2xl border-2 overflow-hidden bg-white shadow-sm shadow-zinc-900/5 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10",
+                state.selectedTemplateId === tpl.id
+                  ? "border-violet-500 ring-4 ring-violet-500/10"
+                  : "border-zinc-200/80 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md",
+              )}
+            >
+              <div className="aspect-[3/4] scale-[0.6] origin-top-left overflow-hidden pointer-events-none">
+                <TemplateRenderer
+                  designSchema={tpl.design_schema}
+                  fieldData={{}}
+                />
+              </div>
+              <div className="border-t border-zinc-100 p-2.5">
+                <p className="truncate text-xs font-medium text-zinc-800">{tpl.name}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+      {/* Live preview */}
+      {selectedTemplate && (
+        <div className="mt-8 flex justify-center">
+          <div className="w-full max-w-sm">
+            <p className="mb-3 text-sm font-medium text-zinc-700">Preview</p>
+            <TemplateRenderer
+              designSchema={selectedTemplate.design_schema}
+              fieldData={previewFieldData}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-between pt-8">
+        <Button type="button" variant="outline" onClick={() => goToStep(1)}>
+          Back
+        </Button>
+        <Button type="button" onClick={handleNext}>
+          Next: Add Guests
+        </Button>
+      </div>
+    </div>
+  );
+=======
+    <div className="mx-auto w-full max-w-[1500px]">
+      {/* Header */}
       <div className="mb-8">
-
         <button
           type="button"
-          onClick={() =>
-            goToStep(1)
-          }
+          onClick={() => goToStep(1)}
           className="
             mb-4
             inline-flex
@@ -429,80 +211,51 @@ export function TemplateSelectionStep({
           "
         >
           <span>←</span>
-
-          {copy.back}
+          Back to Create Event
         </button>
 
-
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-
           <div>
-
             <h2 className="text-3xl font-bold tracking-tight text-neutral-950 md:text-4xl">
-              {state.eventData.language ===
-              "si"
-                ? "ආරාධනා පත්‍රයක් තෝරන්න"
-                : "Choose a Template"}
+              Choose a Template
             </h2>
 
-
             <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500">
-              {state.eventData.language ===
-              "si"
-                ? `ඔබගේ ${state.eventData.category} උත්සවයට ගැළපෙන ආරාධනා නිර්මාණයක් තෝරන්න.`
-                : `Select an invitation design for your ${state.eventData.category} event.`}
+              Select a premium invitation design that best matches
+              your {state.eventData.category} event.
             </p>
-
           </div>
 
-
-          {/* ===============================================
-              COUNTS
-          ================================================ */}
-
+          {/* Stats */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-
             <StatCard
               icon="✦"
-              value={
-                activeTemplates.length
-              }
+              value={templates?.length ?? 0}
               label="Templates"
             />
 
             <StatCard
               icon="♛"
-              value={
-                weddingCount
-              }
+              value={weddingCount}
               label="Wedding"
             />
 
             <StatCard
               icon="🎂"
-              value={
-                birthdayCount
-              }
+              value={birthdayCount}
               label="Birthday"
             />
 
             <StatCard
               icon="▣"
-              value={
-                officeCount
-              }
+              value={officeCount}
               label="Office"
             />
-
           </div>
         </div>
       </div>
 
-
-      {/* =================================================
-          CATEGORY SUMMARY
-      ================================================== */}
-
+      {/* Category summary */}
       <div
         className="
           mb-8
@@ -518,100 +271,55 @@ export function TemplateSelectionStep({
           sm:flex-row
         "
       >
-
         <CategoryItem
           label="Wedding"
-          count={
-            weddingCount
-          }
-          active={
-            state.eventData.category ===
-            "Wedding"
-          }
+          count={weddingCount}
+          active={state.eventData.category === "Wedding"}
           icon="♛"
         />
 
-
         <CategoryItem
           label="Birthday"
-          count={
-            birthdayCount
-          }
-          active={
-            state.eventData.category ===
-            "Birthday"
-          }
+          count={birthdayCount}
+          active={state.eventData.category === "Birthday"}
           icon="🎁"
         />
 
-
         <CategoryItem
           label="Office"
-          count={
-            officeCount
-          }
-          active={
-            state.eventData.category ===
-            "Office"
-          }
+          count={officeCount}
+          active={state.eventData.category === "Office"}
           icon="▣"
         />
-
       </div>
-
-
-      {/* =================================================
-          TEMPLATE GRID + ACTUAL PREVIEW
-      ================================================== */}
 
       <div
         className={`
-          grid
-          gap-8
+          grid gap-8
           ${
             selectedTemplate
-              ? "xl:grid-cols-[minmax(0,1fr)_500px]"
+              ? "xl:grid-cols-[minmax(0,1fr)_390px]"
               : "grid-cols-1"
           }
         `}
       >
-
-        {/* =================================================
-            TEMPLATE CARDS
-        ================================================== */}
-
+        {/* Templates */}
         <section>
-
           {isLoading ? (
-
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-
-              {[
-                1,
-                2,
-              ].map(
-                (item) => (
-
-                  <div
-                    key={
-                      item
-                    }
-                    className="
-                      aspect-[3/4]
-                      animate-pulse
-                      rounded-[22px]
-                      bg-neutral-100
-                    "
-                  />
-
-                ),
-              )}
-
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                <div
+                  key={item}
+                  className="
+                    aspect-[3/4]
+                    animate-pulse
+                    rounded-[22px]
+                    bg-neutral-100
+                  "
+                />
+              ))}
             </div>
-
-          ) : filtered.length ===
-            0 ? (
-
+          ) : filtered.length === 0 ? (
             <div
               className="
                 rounded-2xl
@@ -624,67 +332,31 @@ export function TemplateSelectionStep({
                 text-center
               "
             >
-
               <p className="text-lg font-semibold text-neutral-800">
-                {state.eventData.language ===
-                "si"
-                  ? "ආරාධනා පත්‍ර නොමැත"
-                  : "No templates available"}
+                No templates available
               </p>
-
 
               <p className="mt-2 text-sm text-neutral-500">
-                {state.eventData.language ===
-                "si"
-                  ? "මෙම කාණ්ඩයට ආරාධනා පත්‍ර හමු නොවීය."
-                  : "No templates were found for this category."}
+                No templates were found for this category.
               </p>
-
             </div>
-
           ) : (
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
-              {filtered.map(
-                (
-                  template,
-                  index,
-                ) => (
-
-                  <TemplateCard
-                    key={
-                      template.id
-                    }
-                    category={
-                      template.category
-                    }
-                    thumbnailUrl={
-                      template.thumbnail_url
-                    }
-                    templateName={
-                      template.name
-                    }
-                    index={
-                      index
-                    }
-                    selected={
-                      state.selectedTemplateId ===
-                      template.id
-                    }
-                    onClick={() =>
-                      handleSelect(
-                        template.id,
-                      )
-                    }
-                  />
-
-                ),
-              )}
-
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filtered.map((template, index) => (
+                <TemplateCard
+                  key={template.id}
+                  category={template.category}
+                  thumbnailUrl={template.thumbnail_url}
+                  templateName={template.name}
+                  index={index}
+                  selected={
+                    state.selectedTemplateId === template.id
+                  }
+                  onClick={() => handleSelect(template.id)}
+                />
+              ))}
             </div>
           )}
-
 
           {error && (
             <div
@@ -703,18 +375,11 @@ export function TemplateSelectionStep({
               {error}
             </div>
           )}
-
         </section>
 
-
-        {/* =================================================
-            ACTUAL NEW TEMPLATE PREVIEW
-        ================================================== */}
-
+        {/* Preview */}
         {selectedTemplate && (
-
           <aside className="xl:sticky xl:top-6 xl:self-start">
-
             <div
               className="
                 overflow-hidden
@@ -725,29 +390,17 @@ export function TemplateSelectionStep({
                 shadow-[0_20px_60px_rgba(15,23,42,0.10)]
               "
             >
-
-              {/* PREVIEW HEADER */}
-
               <div className="border-b border-neutral-100 px-6 py-5">
-
-                <div className="flex items-center justify-between gap-4">
-
+                <div className="flex items-center justify-between">
                   <div>
-
                     <p className="text-lg font-bold text-neutral-900">
-                      {state.eventData.language ===
-                      "si"
-                        ? "පෙරදසුන"
-                        : "Preview"}
+                      Preview
                     </p>
-
 
                     <p className="mt-1 text-xs text-neutral-500">
-                      {selectedTemplate.name}
+                      Live invitation preview
                     </p>
-
                   </div>
-
 
                   <span
                     className="
@@ -762,75 +415,34 @@ export function TemplateSelectionStep({
                       text-brand
                     "
                   >
-                    {state.eventData.language ===
-                    "si"
-                      ? "තෝරා ඇත"
-                      : "Selected"}
+                    Selected
                   </span>
-
                 </div>
               </div>
 
-
-              {/* ===============================================
-                  REAL TEMPLATE COMPONENT
-              ================================================ */}
-
-              <div className="bg-neutral-50 p-5">
-
-                <div className="mx-auto w-full overflow-hidden rounded-2xl">
-
-                  <ActualTemplatePreview
-                    templateName={
-                      selectedTemplate.name
-                    }
-                    state={
-                      state
-                    }
-                  />
-
-                </div>
-
+              <div className="p-5">
+                <TemplateRenderer
+                  designSchema={selectedTemplate.design_schema}
+                  fieldData={previewFieldData}
+                  language={state.eventData.language}
+                />
               </div>
-
-
-              {/* TEMPLATE NAME */}
 
               <div className="border-t border-neutral-100 px-5 py-4">
-
                 <p className="truncate text-sm font-semibold text-neutral-900">
                   {selectedTemplate.name}
                 </p>
 
-
                 <p className="mt-1 text-xs text-neutral-500">
-                  {selectedTemplate.category}
-                  {" "}
-                  Invitation
-                  {" · "}
-                  {selectedTemplate.name
-                    .toLowerCase()
-                    .includes(
-                      "sinhala",
-                    )
-                    ? "සිංහල"
-                    : "English"}
+                  {selectedTemplate.category} Invitation · {state.eventData.language === "si" ? "සිංහල" : "English"}
                 </p>
-
               </div>
-
             </div>
-
           </aside>
         )}
-
       </div>
 
-
-      {/* =================================================
-          NAVIGATION
-      ================================================== */}
-
+      {/* Navigation */}
       <div
         className="
           mt-10
@@ -842,12 +454,9 @@ export function TemplateSelectionStep({
           pt-8
         "
       >
-
         <button
           type="button"
-          onClick={() =>
-            goToStep(1)
-          }
+          onClick={() => goToStep(1)}
           className="
             rounded-xl
             border
@@ -864,15 +473,12 @@ export function TemplateSelectionStep({
             hover:bg-neutral-50
           "
         >
-          ← {copy.back}
+          ← Back
         </button>
-
 
         <button
           type="button"
-          onClick={
-            handleNext
-          }
+          onClick={handleNext}
           className="
             rounded-xl
             bg-brand
@@ -888,29 +494,18 @@ export function TemplateSelectionStep({
             hover:shadow-[0_14px_40px_rgba(147,51,234,0.30)]
           "
         >
-          {state.eventData.language ===
-          "si"
-            ? "ඊළඟ: ආරාධිතයන් එක් කරන්න →"
-            : "Next: Add Guests →"}
+          Next: Add Guests →
         </button>
-
       </div>
-
     </div>
   );
 }
-
-
-/* =========================================================
-   STAT CARD
-========================================================= */
 
 interface StatCardProps {
   icon: string;
   value: number;
   label: string;
 }
-
 
 function StatCard({
   icon,
@@ -930,9 +525,7 @@ function StatCard({
         shadow-[0_8px_25px_rgba(15,23,42,0.06)]
       "
     >
-
       <div className="flex items-center gap-3">
-
         <div
           className="
             flex
@@ -949,30 +542,19 @@ function StatCard({
           {icon}
         </div>
 
-
         <div>
-
           <p className="text-lg font-bold leading-none text-neutral-900">
             {value}
           </p>
 
-
           <p className="mt-1 text-[11px] text-neutral-500">
             {label}
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }
-
-
-/* =========================================================
-   CATEGORY ITEM
-========================================================= */
 
 interface CategoryItemProps {
   label: string;
@@ -980,7 +562,6 @@ interface CategoryItemProps {
   active: boolean;
   icon: string;
 }
-
 
 function CategoryItem({
   label,
@@ -1009,14 +590,9 @@ function CategoryItem({
         }
       `}
     >
+      <span>{icon}</span>
 
-      <span>
-        {icon}
-      </span>
-
-      <span>
-        {label}
-      </span>
+      <span>{label}</span>
 
       <span
         className={`
@@ -1033,7 +609,7 @@ function CategoryItem({
       >
         {count}
       </span>
-
     </div>
   );
+>>>>>>> main
 }
