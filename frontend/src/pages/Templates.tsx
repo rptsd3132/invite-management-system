@@ -1,112 +1,230 @@
 import { useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
+
 import { getTemplates } from "../lib/api";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
+import { resolveTemplateImage } from "../components/templates/templateImages";
+
 import type { Template } from "../types";
 
-const DEFAULT_TYPOGRAPHY = {
-  title_classes:
-    "font-serif text-[clamp(1.5rem,5vw,2.5rem)] font-semibold text-white",
-  accent_classes:
-    "font-serif text-[clamp(1rem,3.5vw,1.5rem)] italic text-white/90",
-  body_classes:
-    "text-[clamp(0.7rem,2vw,0.875rem)] uppercase tracking-[0.18em] text-white/80",
+
+/* =========================================================
+   CATEGORY COLORS
+========================================================= */
+
+const categoryColors: Record<
+  string,
+  string
+> = {
+  Wedding:
+    "bg-pink-100 text-pink-700 border-pink-200",
+
+  Office:
+    "bg-blue-100 text-blue-700 border-blue-200",
+
+  Birthday:
+    "bg-yellow-100 text-yellow-700 border-yellow-200",
 };
 
-const DEFAULT_DESIGN_SCHEMA = {
-  container_classes:
-    "relative mx-auto aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl shadow-xl",
-  background: "bg-gradient-to-br from-slate-700 to-slate-950",
-  decorations: [] as string[],
-  typography: DEFAULT_TYPOGRAPHY,
-  required_fields: [] as string[],
-};
 
-const categoryColors: Record<string, string> = {
-  Wedding: "bg-pink-100 text-pink-700 border-pink-200",
-  Office: "bg-blue-100 text-blue-700 border-blue-200",
-  Birthday: "bg-yellow-100 text-yellow-700 border-yellow-200",
-};
+/* =========================================================
+   ONLY THESE SIX TEMPLATES WILL BE DISPLAYED
+========================================================= */
 
-function TemplatePreview({ template }: { template: Template }) {
-  const navigate = useNavigate();
+const ACTIVE_TEMPLATE_NAMES = [
+  "English Wedding",
+  "Sinhala Wedding",
+
+  "English Birthday",
+  "Sinhala Birthday",
+
+  "English Office",
+  "Sinhala Office",
+];
+
+
+/* =========================================================
+   TEMPLATE PREVIEW CARD
+========================================================= */
+
+function TemplatePreview({
+  template,
+}: {
+  template: Template;
+}): React.ReactElement {
+  const navigate =
+    useNavigate();
+
 
   const colorClass =
-    categoryColors[template.category] ??
+    categoryColors[
+      template.category
+    ] ??
     "bg-neutral-100 text-neutral-700 border-neutral-200";
 
-  const rawSchema = template.design_schema ?? {};
 
-  const designSchema = {
-    ...DEFAULT_DESIGN_SCHEMA,
-    ...rawSchema,
+  const rawSchema =
+    template.design_schema as
+      | {
+          background_image?:
+            | string
+            | null;
+        }
+      | null
+      | undefined;
 
-    decorations: Array.isArray(rawSchema.decorations)
-      ? rawSchema.decorations
-      : [],
 
-    required_fields: Array.isArray(rawSchema.required_fields)
-      ? rawSchema.required_fields
-      : [],
+  const thumbnailPath =
+    template.thumbnail_url ??
+    rawSchema?.background_image ??
+    null;
 
-    typography: {
-      ...DEFAULT_TYPOGRAPHY,
-      ...(rawSchema.typography ?? {}),
-    },
-  };
+
+  const imageSource =
+    resolveTemplateImage(
+      thumbnailPath,
+    );
+
 
   return (
     <button
       type="button"
-      onClick={() => navigate(`/templates/${template.id}`)}
-      className="group rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+      onClick={() =>
+        navigate(
+          `/templates/${template.id}`,
+        )
+      }
+      className="
+        group
+        w-full
+        rounded-xl
+        text-left
+        focus-visible:outline-none
+        focus-visible:ring-2
+        focus-visible:ring-brand
+        focus-visible:ring-offset-2
+      "
     >
-      <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
+      <div
+        className="
+          overflow-hidden
+          rounded-xl
+          border
+          border-neutral-200
+          bg-white
+          shadow-sm
+          transition-all
+          duration-300
+          group-hover:-translate-y-1
+          group-hover:shadow-xl
+        "
+      >
+        {/* =================================================
+            IMAGE
+        ================================================== */}
+
         <div className="p-3">
           <div
-            className={cn(
-              "relative isolate overflow-hidden rounded-lg",
-              designSchema.container_classes,
-              designSchema.background,
-            )}
-            style={{
-              maxWidth: "100%",
-              aspectRatio: "3/4",
-            }}
+            className="
+              relative
+              aspect-[3/4]
+              w-full
+              overflow-hidden
+              rounded-lg
+              bg-neutral-100
+            "
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/35" />
-
-            <div className="pointer-events-none absolute inset-3 rounded-md border border-white/40" />
-
-            <div className="relative z-10 flex h-full flex-col items-center justify-center p-4 text-center">
-              <span
-                className={cn(
-                  designSchema.typography.title_classes,
-                  "max-w-full truncate text-base",
-                )}
-              >
-                {template.name}
-              </span>
-
+            {imageSource ? (
+              <img
+                src={imageSource}
+                alt={template.name}
+                className="
+                  h-full
+                  w-full
+                  object-cover
+                  transition-transform
+                  duration-700
+                  ease-out
+                  group-hover:scale-[1.04]
+                "
+              />
+            ) : (
               <div
-                className={cn(
-                  designSchema.typography.accent_classes,
-                  "mt-1 text-xs",
-                )}
+                className="
+                  flex
+                  h-full
+                  w-full
+                  items-center
+                  justify-center
+                  bg-neutral-100
+                  px-4
+                  text-center
+                  text-sm
+                  text-neutral-400
+                "
               >
-                Preview
+                No Preview
               </div>
-            </div>
+            )}
+
+
+            {/* DARK GRADIENT */}
+
+            <div
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                bg-gradient-to-t
+                from-black/25
+                via-transparent
+                to-transparent
+              "
+            />
+
+
+            {/* HOVER EFFECT */}
+
+            <div
+              className="
+                pointer-events-none
+                absolute
+                inset-0
+                opacity-0
+                transition-opacity
+                duration-300
+                group-hover:bg-white/5
+                group-hover:opacity-100
+              "
+            />
           </div>
         </div>
 
+
+        {/* =================================================
+            CARD INFORMATION
+        ================================================== */}
+
         <div className="flex items-center justify-between gap-2 px-3 pb-3">
-          <span className="truncate text-sm font-medium text-neutral-800">
+
+          <span
+            className="
+              min-w-0
+              truncate
+              text-sm
+              font-medium
+              text-neutral-800
+            "
+          >
             {template.name}
           </span>
+
 
           <span
             className={cn(
@@ -116,6 +234,7 @@ function TemplatePreview({ template }: { template: Template }) {
           >
             {template.category}
           </span>
+
         </div>
       </div>
     </button>
@@ -123,113 +242,380 @@ function TemplatePreview({ template }: { template: Template }) {
 }
 
 
+/* =========================================================
+   MAIN TEMPLATES PAGE
+========================================================= */
 
 export function Templates(): React.ReactElement {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const categoryFilter = searchParams.get("category");
+  const navigate =
+    useNavigate();
 
-  const { data: templates, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["templates"],
-    queryFn: getTemplates,
+
+  const [
+    searchParams,
+  ] = useSearchParams();
+
+
+  const categoryFilter =
+    searchParams.get(
+      "category",
+    );
+
+
+  const {
+    data: templates,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: [
+      "templates",
+    ],
+
+    queryFn:
+      getTemplates,
   });
 
-  const filtered = useMemo(() => {
-    if (!templates) return [];
-    if (!categoryFilter) return templates;
-    return templates.filter((t) => t.category === categoryFilter);
-  }, [templates, categoryFilter]);
 
-  const categories = useMemo(() => {
-    if (!templates) return [];
-    return [...new Set(templates.map((t) => t.category))];
-  }, [templates]);
+  /* =====================================================
+     REMOVE ALL OLD TEMPLATES
+  ====================================================== */
+
+  const activeTemplates =
+    useMemo(() => {
+      if (!templates) {
+        return [];
+      }
+
+
+      return templates.filter(
+        (template) =>
+          ACTIVE_TEMPLATE_NAMES.includes(
+            template.name,
+          ),
+      );
+    }, [
+      templates,
+    ]);
+
+
+  /* =====================================================
+     FILTER BY CATEGORY
+  ====================================================== */
+
+  const filtered =
+    useMemo(() => {
+      if (
+        !categoryFilter
+      ) {
+        return activeTemplates;
+      }
+
+
+      return activeTemplates.filter(
+        (template) =>
+          template.category ===
+          categoryFilter,
+      );
+    }, [
+      activeTemplates,
+      categoryFilter,
+    ]);
+
+
+  /* =====================================================
+     CATEGORY BUTTONS
+  ====================================================== */
+
+  const categories =
+    useMemo(() => {
+      return [
+        ...new Set(
+          activeTemplates.map(
+            (template) =>
+              template.category,
+          ),
+        ),
+      ];
+    }, [
+      activeTemplates,
+    ]);
+
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex items-center gap-4 mb-8">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+
+      {/* ===================================================
+          HEADER
+      ==================================================== */}
+
+      <div className="mb-8 flex items-center gap-4">
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            navigate("/")
+          }
+        >
           <ArrowLeft className="h-4 w-4" />
+
           Back
         </Button>
+
+
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">
-            {categoryFilter ? categoryFilter : "All"} Templates
-          </h1>
-          <p className="text-sm text-neutral-500 mt-1">
+
+          <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">
+
             {categoryFilter
-              ? `Showing ${filtered.length} template${filtered.length !== 1 ? "s" : ""}`
-              : `${templates?.length ?? 0} template${templates?.length !== 1 ? "s" : ""} available`}
+              ? categoryFilter
+              : "All"}{" "}
+
+            Templates
+
+          </h1>
+
+
+          <p className="mt-1 text-sm text-neutral-500">
+
+            {categoryFilter
+              ? `Showing ${
+                  filtered.length
+                } template${
+                  filtered.length !==
+                  1
+                    ? "s"
+                    : ""
+                }`
+              : `${
+                  activeTemplates.length
+                } template${
+                  activeTemplates.length !==
+                  1
+                    ? "s"
+                    : ""
+                } available`}
+
           </p>
+
         </div>
       </div>
 
-      {categories.length > 1 && !categoryFilter && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => navigate(`/templates?category=${encodeURIComponent(cat)}`)}
-              className={cn(
-                "text-sm px-3 py-1 rounded-full border transition-colors",
-                categoryColors[cat] ?? "bg-neutral-100 text-neutral-700 border-neutral-200",
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+
+      {/* ===================================================
+          CATEGORY FILTER BUTTONS
+      ==================================================== */}
+
+      {categories.length >
+        1 &&
+        !categoryFilter && (
+
+        <div className="mb-6 flex flex-wrap gap-2">
+
+          {categories.map(
+            (category) => (
+
+              <button
+                key={category}
+                type="button"
+                onClick={() =>
+                  navigate(
+                    `/templates?category=${encodeURIComponent(
+                      category,
+                    )}`,
+                  )
+                }
+                className={cn(
+                  "rounded-full border px-3 py-1 text-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm",
+
+                  categoryColors[
+                    category
+                  ] ??
+                    "bg-neutral-100 text-neutral-700 border-neutral-200",
+                )}
+              >
+                {category}
+              </button>
+
+            ),
+          )}
+
         </div>
       )}
+
+
+      {/* ===================================================
+          LOADING
+      ==================================================== */}
 
       {isLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="animate-pulse rounded-xl border border-neutral-200 bg-white overflow-hidden">
-              <div className="aspect-[3/4] bg-neutral-100 m-3 rounded-lg" />
-              <div className="p-3 space-y-2">
-                <div className="h-4 bg-neutral-100 rounded w-3/4" />
-                <div className="h-3 bg-neutral-100 rounded w-1/4" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+
+          {Array.from({
+            length: 6,
+          }).map(
+            (
+              _,
+              index,
+            ) => (
+
+              <div
+                key={index}
+                className="
+                  animate-pulse
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-neutral-200
+                  bg-white
+                "
+              >
+                <div className="m-3 aspect-[3/4] rounded-lg bg-neutral-100" />
+
+                <div className="space-y-2 p-3">
+
+                  <div className="h-4 w-3/4 rounded bg-neutral-100" />
+
+                  <div className="h-3 w-1/4 rounded bg-neutral-100" />
+
+                </div>
               </div>
-            </div>
-          ))}
+
+            ),
+          )}
+
         </div>
       )}
+
+
+      {/* ===================================================
+          ERROR
+      ==================================================== */}
 
       {isError && (
-        <div className="flex flex-col items-center gap-4 rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            gap-4
+            rounded-xl
+            border
+            border-red-200
+            bg-red-50
+            p-8
+            text-center
+          "
+        >
+
           <p className="text-red-700">
-            {(error as Error)?.message ?? "Failed to load templates."}
+
+            {(error as Error)
+              ?.message ??
+              "Failed to load templates."}
+
           </p>
-          <Button variant="outline" onClick={() => refetch()}>
+
+
+          <Button
+            variant="outline"
+            onClick={() =>
+              refetch()
+            }
+          >
             Retry
           </Button>
+
         </div>
       )}
 
-      {!isLoading && !isError && filtered.length === 0 && (
-        <div className="flex flex-col items-center gap-4 rounded-xl border border-neutral-200 bg-white p-12 text-center">
-          <p className="text-lg font-medium text-neutral-600">No templates found</p>
-          <p className="text-sm text-neutral-400">
-            {categoryFilter
-              ? `No templates in the "${categoryFilter}" category yet.`
-              : "Templates will appear here once they are added."}
+
+      {/* ===================================================
+          NO TEMPLATES
+      ==================================================== */}
+
+      {!isLoading &&
+        !isError &&
+        filtered.length ===
+          0 && (
+
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            gap-4
+            rounded-xl
+            border
+            border-neutral-200
+            bg-white
+            p-12
+            text-center
+          "
+        >
+
+          <p className="text-lg font-medium text-neutral-600">
+            No templates found
           </p>
+
+
+          <p className="text-sm text-neutral-400">
+
+            {categoryFilter
+              ? `No active templates in the "${categoryFilter}" category.`
+              : "No active templates are available."}
+
+          </p>
+
+
           {categoryFilter && (
-            <Button variant="outline" onClick={() => navigate("/templates")}>
+            <Button
+              variant="outline"
+              onClick={() =>
+                navigate(
+                  "/templates",
+                )
+              }
+            >
               View All Templates
             </Button>
           )}
+
         </div>
       )}
 
-      {!isLoading && !isError && filtered.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((template) => (
-            <TemplatePreview key={template.id} template={template} />
-          ))}
+
+      {/* ===================================================
+          TEMPLATE GRID
+      ==================================================== */}
+
+      {!isLoading &&
+        !isError &&
+        filtered.length >
+          0 && (
+
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+
+          {filtered.map(
+            (template) => (
+
+              <TemplatePreview
+                key={
+                  template.id
+                }
+                template={
+                  template
+                }
+              />
+
+            ),
+          )}
+
         </div>
       )}
+
     </div>
   );
 }

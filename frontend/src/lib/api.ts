@@ -20,12 +20,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-<<<<<<< HEAD
   const { access_token } = useAuthStore.getState();
-  if (access_token) {
-    config.headers.Authorization = `Bearer ${access_token}`;
-=======
-  let accessToken: string | null = localStorage.getItem("token");
+
+  let accessToken: string | null =
+    access_token ?? localStorage.getItem("token");
 
   if (!accessToken) {
     const authStorage = localStorage.getItem("auth-storage");
@@ -42,7 +40,6 @@ api.interceptors.request.use((config) => {
         accessToken = null;
       }
     }
->>>>>>> main
   }
 
   if (accessToken) {
@@ -134,14 +131,10 @@ export async function createEvent(
 }
 
 export async function getEvents(): Promise<EventResponse[]> {
-<<<<<<< HEAD
-  const { data } = await api.get<EventResponse[]>("/api/v1/events/");
-=======
   const { data } = await api.get<EventResponse[]>(
     "/api/v1/events",
   );
 
->>>>>>> main
   return data;
 }
 
