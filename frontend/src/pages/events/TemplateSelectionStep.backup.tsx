@@ -198,18 +198,6 @@ export function TemplateSelectionStep({
       payload: id,
     });
 
-    const targetTemplate = activeTemplates.find((t) => t.id === id);
-    if (targetTemplate) {
-      const isSinhala = targetTemplate.name.toLowerCase().includes("sinhala");
-      dispatch({
-        type: "SET_EVENT_DATA",
-        payload: {
-          category: targetTemplate.category,
-          language: isSinhala ? "si" : "en",
-        },
-      });
-    }
-
     setError("");
   };
 
@@ -390,12 +378,6 @@ export function TemplateSelectionStep({
           count={weddingCount}
           active={state.eventData.category === "Wedding"}
           icon="♛"
-          onClick={() =>
-            dispatch({
-              type: "SET_EVENT_DATA",
-              payload: { category: "Wedding" },
-            })
-          }
         />
 
         <CategoryItem
@@ -403,12 +385,6 @@ export function TemplateSelectionStep({
           count={birthdayCount}
           active={state.eventData.category === "Birthday"}
           icon="🎁"
-          onClick={() =>
-            dispatch({
-              type: "SET_EVENT_DATA",
-              payload: { category: "Birthday" },
-            })
-          }
         />
 
         <CategoryItem
@@ -416,12 +392,6 @@ export function TemplateSelectionStep({
           count={officeCount}
           active={state.eventData.category === "Office"}
           icon="▣"
-          onClick={() =>
-            dispatch({
-              type: "SET_EVENT_DATA",
-              payload: { category: "Office" },
-            })
-          }
         />
       </div>
 
@@ -701,7 +671,6 @@ interface CategoryItemProps {
   count: number;
   active: boolean;
   icon: string;
-  onClick?: () => void;
 }
 
 function CategoryItem({
@@ -709,12 +678,9 @@ function CategoryItem({
   count,
   active,
   icon,
-  onClick,
 }: CategoryItemProps): React.ReactElement {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div
       className={`
         flex
         flex-1
@@ -727,11 +693,10 @@ function CategoryItem({
         text-sm
         font-semibold
         transition-all
-        cursor-pointer
         ${
           active
             ? "bg-brand/10 text-brand shadow-sm"
-            : "text-neutral-500 hover:bg-neutral-100"
+            : "text-neutral-500"
         }
       `}
     >
@@ -754,6 +719,6 @@ function CategoryItem({
       >
         {count}
       </span>
-    </button>
+    </div>
   );
 }

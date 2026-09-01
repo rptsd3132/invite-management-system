@@ -848,6 +848,180 @@ TEMPLATES_DATA = [
             ),
         },
     ),
+
+    # =========================================================
+    # ACTIVE TEMPLATES - English & Sinhala Versions (Used in UI)
+    # =========================================================
+
+    make_template(
+        "English Wedding",
+        "Wedding",
+        "/templates/wedding/traditional-wedding-template.png",
+        "wedding-botanical",
+        WEDDING_FIELDS,
+        {
+            "bride_name": text_pos(
+                50, 30, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "groom_name": text_pos(
+                50, 50, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "event_date_time": text_pos(
+                50, 67, 58, "xs", "#F8E7B0",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 74, 60, "xs", "#F8E7B0",
+                family="sans", weight=500,
+            ),
+            "participant_name": text_pos(
+                50, 84, 56, "sm", "#FFFFFF",
+                family="serif", weight=600,
+            ),
+        },
+    ),
+
+    make_template(
+        "Sinhala Wedding",
+        "Wedding",
+        "/templates/wedding/sinhala-wedding-template.jpg",
+        "wedding-botanical",
+        WEDDING_FIELDS,
+        {
+            "bride_name": text_pos(
+                50, 30, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "groom_name": text_pos(
+                50, 50, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "event_date_time": text_pos(
+                50, 67, 58, "xs", "#F8E7B0",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 74, 60, "xs", "#F8E7B0",
+                family="sans", weight=500,
+            ),
+            "participant_name": text_pos(
+                50, 84, 56, "sm", "#FFFFFF",
+                family="serif", weight=600,
+            ),
+        },
+    ),
+
+    make_template(
+        "English Birthday",
+        "Birthday",
+        "/templates/birthday/Purple and Pink Watercolor Birthday Invitation.png",
+        "birthday-watercolor",
+        BIRTHDAY_FIELDS,
+        {
+            "birthday_person_name": text_pos(
+                50, 50, 50, "lg", "#7358a8",
+                family="serif", weight=700,
+            ),
+            "event_date_time": text_pos(
+                50, 64, 54, "xs", "#FFFFFF",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 72, 56, "xs", "#FFFFFF",
+                family="sans", weight=500,
+            ),
+            "participant_name": text_pos(
+                50, 82, 48, "sm", "#FFFFFF",
+                family="sans", weight=700,
+            ),
+        },
+        aspect_ratio="1046 / 1536",
+    ),
+
+    make_template(
+        "Sinhala Birthday",
+        "Birthday",
+        "/templates/birthday/sinhala-birthday-template.png",
+        "birthday-watercolor",
+        BIRTHDAY_FIELDS,
+        {
+            "birthday_person_name": text_pos(
+                50, 50, 50, "lg", "#7358a8",
+                family="serif", weight=700,
+            ),
+            "event_date_time": text_pos(
+                50, 64, 54, "xs", "#FFFFFF",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 72, 56, "xs", "#FFFFFF",
+                family="sans", weight=500,
+            ),
+            "participant_name": text_pos(
+                50, 82, 48, "sm", "#FFFFFF",
+                family="sans", weight=700,
+            ),
+        },
+        aspect_ratio="1046 / 1536",
+    ),
+
+    make_template(
+        "English Office",
+        "Office",
+        "/templates/office/office-ai-template.png",
+        "office-corporate",
+        OFFICE_FIELDS,
+        {
+            "event_name": text_pos(
+                50, 40, 64, "md", "#FFFFFF",
+                family="sans", weight=800,
+            ),
+            "participant_name": text_pos(
+                50, 52, 52, "xs", "#E6E8EB",
+                family="sans", weight=700,
+                uppercase=True, letter_spacing="0.08em",
+            ),
+            "event_date_time": text_pos(
+                50, 62, 56, "xs", "#FFFFFF",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 72, 58, "xs", "#FFFFFF",
+                family="sans", weight=500,
+            ),
+        },
+        aspect_ratio="1 / 1",
+    ),
+
+    make_template(
+        "Sinhala Office",
+        "Office",
+        "/templates/office/sinhala-office-ai-template.png",
+        "office-corporate",
+        OFFICE_FIELDS,
+        {
+            "event_name": text_pos(
+                50, 40, 64, "md", "#FFFFFF",
+                family="sans", weight=800,
+            ),
+            "participant_name": text_pos(
+                50, 52, 52, "xs", "#E6E8EB",
+                family="sans", weight=700,
+                uppercase=True, letter_spacing="0.08em",
+            ),
+            "event_date_time": text_pos(
+                50, 62, 56, "xs", "#FFFFFF",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 72, 58, "xs", "#FFFFFF",
+                family="sans", weight=500,
+            ),
+        },
+        aspect_ratio="1 / 1",
+    ),
 ]
 
 

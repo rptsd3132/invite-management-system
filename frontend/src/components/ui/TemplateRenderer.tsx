@@ -2,7 +2,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState,
+  useState,  
 } from "react";
 
 import type {
@@ -11,7 +11,6 @@ import type {
 } from "react";
 
 import { cn } from "../../lib/utils";
-import { resolveTemplateImage } from "../assets/templateImages";
 import type { InvitationLanguage } from "../../lib/invitationLanguage";
 
 import {
@@ -1678,10 +1677,7 @@ export function TemplateRenderer({
 
 
   const backgroundImage =
-    resolveTemplateImage(
-      designSchema
-        .background_image,
-    );
+    designSchema.background_image ?? undefined;
 
 
   const positionedMode =
@@ -1705,18 +1701,11 @@ export function TemplateRenderer({
         "overflow-hidden",
         "rounded-[30px]",
 
-        "border",
-        "border-white/30",
-
-        "shadow-[0_26px_80px_rgba(15,23,42,0.22)]",
+        "shadow-none",
 
         "transition-all",
         "duration-500",
         "ease-out",
-
-        "hover:-translate-y-1",
-
-        "hover:shadow-[0_34px_100px_rgba(15,23,42,0.30)]",
 
         style.root,
 

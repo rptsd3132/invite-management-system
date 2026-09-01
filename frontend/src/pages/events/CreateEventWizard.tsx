@@ -5,20 +5,11 @@ import { TemplateSelectionStep } from "./TemplateSelectionStep";
 import { GuestListStep } from "./GuestListStep";
 import { ReviewConfirmStep } from "./ReviewConfirmStep";
 import { StepIndicator } from "../../components/events/StepIndicator";
-import { useEventStore } from "../../store/useEventStore";
+import { useEventStore, type EventDraft } from "../../store/useEventStore";
 import { useAuthStore } from "../../store/authStore";
 
 export interface WizardState {
-  eventData: {
-    eventName: string;
-    location: string;
-    eventDate: string;
-    category: string;
-    language: string;
-    metadata: Record<string, string>;
-    latitude: number | null;
-    longitude: number | null;
-  };
+  eventData: EventDraft;
   selectedTemplateId: string | null;
   guests: Array<{ guestName: string; email: string }>;
 }
@@ -77,7 +68,7 @@ export function CreateEventWizard(): React.ReactElement {
 
   useEffect(() => {
     const templateId = searchParams.get("templateId");
-    if (templateId && !selectedTemplateId) {
+    if (templateId && selectedTemplateId !== templateId) {
       setTemplate(templateId);
     }
   }, [searchParams, selectedTemplateId, setTemplate]);

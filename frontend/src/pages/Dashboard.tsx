@@ -9,7 +9,9 @@ import { DynamicTemplateCarousel } from "../components/ui/DynamicTemplateCarouse
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
-
+import traditionalWeddingTemplate from "../components/assets/wedding/assets/traditional-wedding-template.png";
+import birthdayTemplate from "../components/assets/birthday/assets/Purple and Pink Watercolor Birthday Invitation.png";
+import officeTemplate from "../components/assets/office/assets/office-ai-template.png";
 function SkeletonCard(): React.ReactElement {
   return (
     <div className="animate-pulse snap-start shrink-0 w-64 md:w-72 rounded-xl border border-neutral-200 bg-white overflow-hidden">
@@ -40,15 +42,26 @@ export function Dashboard(): React.ReactElement {
     queryFn: getTemplates,
   });
 
-  const categoryCards = useMemo(() => {
-    if (!templates) return [];
-    const grouped = groupByCategory(templates);
-    return Array.from(grouped.entries()).map(([category, template], idx) => ({
+  const categoryPreviewImages: Record<string, string> = {
+  Wedding: traditionalWeddingTemplate,
+  Birthday: birthdayTemplate,
+  Office: officeTemplate,
+};
+
+const categoryCards = useMemo(() => {
+  if (!templates) return [];
+
+  const grouped = groupByCategory(templates);
+
+  return Array.from(grouped.entries()).map(
+    ([category, template], idx) => ({
       category,
-      thumbnailUrl: template.thumbnail_url,
+      thumbnailUrl:
+        categoryPreviewImages[category] ?? template.thumbnail_url,
       index: idx,
-    }));
-  }, [templates]);
+    }),
+  );
+}, [templates]);
 
   const uniqueCategories = useMemo(() => {
     if (!templates) return [];

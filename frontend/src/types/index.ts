@@ -1,15 +1,76 @@
-export interface DesignTypography {
-  title_classes: string;
-  accent_classes: string;
-  body_classes: string;
+export type OverlayMode =
+  | "full"
+  | "minimal"
+  | "positioned";
+
+export type TextAlign =
+  | "left"
+  | "center"
+  | "right";
+
+export type TextFamily =
+  | "serif"
+  | "sans"
+  | "mono";
+
+export type TextSize =
+  | "hero"
+  | "xl"
+  | "lg"
+  | "md"
+  | "sm"
+  | "xs";
+
+export type ValuePart =
+  | "full"
+  | "date"
+  | "time";
+
+export interface PositionedText {
+  x: number;
+  y: number;
+  width?: number;
+  size?: TextSize;
+  color?: string;
+  align?: TextAlign;
+  family?: TextFamily;
+  weight?: number;
+  letter_spacing?: string;
+  uppercase?: boolean;
+  shadow?: boolean;
+  value_part?: ValuePart;
+  prefix?: string;
+  suffix?: string;
+}
+
+export interface StaticText extends PositionedText {
+  text: string;
 }
 
 export interface DesignSchema {
-  container_classes: string;
-  background: string;
-  decorations: string[];
-  typography: DesignTypography;
+  background_image?: string | null;
+  background_position?: string;
+  style_key?: import("../components/ui/templateStyles").TemplateStyleKey;
+  category?: string;
+  badge_text?: string | null;
+  eyebrow_text?: string | null;
+
   required_fields: string[];
+
+  overlay_mode?: OverlayMode;
+  display_fields?: string[];
+
+  aspect_ratio?: string;
+
+  layout?: Record<
+    string,
+    PositionedText
+  >;
+
+  static_texts?: StaticText[];
+
+  container_classes?: string;
+  background?: string;
 }
 
 export interface Template {

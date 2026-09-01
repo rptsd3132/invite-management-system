@@ -4,6 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, MapPin, Check, Heart } from "lucide-react";
 import { getInvitationByToken, updateRsvpStatus } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
+import WeddingInvitation from "../components/assets/wedding/WeddingInvitation";
+import BirthdayInvitation from "../components/assets/birthday/BirthdayInvitation";
+import OfficeInvitation from "../components/assets/office/OfficeInvitation";
 
 import {
   formatInvitationDate,
@@ -110,6 +113,28 @@ export function InvitationPage(): React.ReactElement {
     template,
   } = data;
 
+  const category = template?.design_schema?.category ?? "Wedding";
+  const eventName = event.event_name;
+  const guestName = participant.guest_name;
+  const brideName = localizedFieldData.bride_name ?? "Bride";
+  const groomName = localizedFieldData.groom_name ?? "Groom";
+  const birthdayPerson = localizedFieldData.birthday_person_name ?? localizedFieldData.birthday_person ?? "Birthday Star";
+  const companyName = localizedFieldData.company_name ?? event.company_name ?? "Company";
+  const invitationCard = (
+    <TemplateRenderer
+      designSchema={template.design_schema}
+      fieldData={localizedFieldData}
+      language={language}
+    />
+  );
+
+  const OpeningAnimation =
+    category === "Birthday"
+      ? BirthdayInvitation
+      : category === "Office"
+        ? OfficeInvitation
+        : WeddingInvitation;
+
   const hasAlreadyResponded = responded || participant.rsvp_status !== "pending";
 
   return (
@@ -131,11 +156,19 @@ export function InvitationPage(): React.ReactElement {
 
       <main className="flex flex-1 flex-col items-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-sm">
-          <TemplateRenderer
-            designSchema={template.design_schema}
-            fieldData={localizedFieldData}
-            language={language}
-          />
+          <OpeningAnimation
+            guestName={guestName}
+            eventName={eventName}
+            companyName={companyName}
+            date={event.event_date}
+            time={event.event_date}
+            location={event.location}
+            brideName={brideName}
+            groomName={groomName}
+            birthdayPerson={birthdayPerson}
+          >
+            {invitationCard}
+          </OpeningAnimation>
         </div>
 
         <div className="mt-8 text-center">

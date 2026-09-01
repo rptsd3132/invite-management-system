@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
 import { ArrowRight } from "lucide-react";
 import { cn } from "../lib/utils";
-import { resolveTemplateImage } from "./assets/templateImages";
 import { TemplateRenderer } from "./ui/TemplateRenderer";
 import type { Template } from "../types";
 
@@ -54,10 +53,7 @@ export function TemplateCard({
   designSchema,
   sampleFieldData,
 }: TemplateCardProps): ReactElement {
-  const imageSource =
-    resolveTemplateImage(thumbnailUrl) ??
-    thumbnailUrl ??
-    undefined;
+  const imageSource = thumbnailUrl ?? undefined;
 
   const categoryStyle = getCategoryStyle(category);
 
@@ -85,7 +81,6 @@ export function TemplateCard({
       {/* Image / Live Preview */}
       <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
         {designSchema && sampleFieldData ? (
-          /* Live preview mode */
           <div className="relative h-full w-full overflow-hidden">
             <div className="pointer-events-none absolute left-0 top-0 h-[550px] w-[400px] origin-top-left scale-[0.55] sm:scale-[0.6]">
               <TemplateRenderer
@@ -94,7 +89,6 @@ export function TemplateCard({
               />
             </div>
 
-            {/* Hover overlay */}
             <div
               className="
                 absolute inset-0 z-10
@@ -121,7 +115,6 @@ export function TemplateCard({
             </div>
           </div>
         ) : imageSource ? (
-          /* Static image mode (existing) */
           <img
             src={imageSource}
             alt={templateName ?? category}
@@ -142,7 +135,6 @@ export function TemplateCard({
           </div>
         )}
 
-        {/* Image overlays (static mode only) */}
         {!designSchema && (
           <>
             <div
@@ -160,7 +152,6 @@ export function TemplateCard({
           </>
         )}
 
-        {/* Premium badge */}
         <div
           className={cn(
             "absolute right-3 top-3 z-20",
@@ -176,7 +167,6 @@ export function TemplateCard({
           Premium
         </div>
 
-        {/* Selected badge */}
         {selected && (
           <div
             className="
@@ -189,7 +179,6 @@ export function TemplateCard({
           </div>
         )}
 
-        {/* Bottom glass gradient (static mode only) */}
         {!designSchema && (
           <div
             className="
@@ -200,7 +189,6 @@ export function TemplateCard({
         )}
       </div>
 
-      {/* Footer */}
       <div className="flex min-h-[78px] items-center justify-between gap-3 px-4 py-4">
         <div className="min-w-0 flex-1">
           <p
@@ -250,7 +238,6 @@ export function TemplateCard({
         </div>
       </div>
 
-      {/* Bottom selected line */}
       <div
         className={cn(
           "absolute inset-x-0 bottom-0 h-[3px]",
