@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-import birthdayTemplateImage from "./assets/Purple and Pink Watercolor Birthday Invitation.png";
+import birthdayTemplateImage from "./assets/sinhala-birthday-template.png";
 
 interface SinhalaBirthdayTemplateProps {
   guestName?: string;
@@ -12,12 +12,12 @@ interface SinhalaBirthdayTemplateProps {
   language?: "en" | "si";
 }
 
-function formatBirthdayDate(value: string): {
+function formatBirthdayDate(value: string, timeValue = ""): {
   dateText: string;
   timeText: string;
 } {
   if (!value) {
-    return { dateText: "", timeText: "" };
+    return { dateText: "", timeText: timeValue };
   }
 
   const parsedDate = new Date(value);
@@ -28,13 +28,13 @@ function formatBirthdayDate(value: string): {
     if (atIndex !== -1) {
       return {
         dateText: value.slice(0, atIndex).trim(),
-        timeText: value.slice(atIndex + 4).trim(),
+        timeText: timeValue || value.slice(atIndex + 4).trim(),
       };
     }
 
     return {
       dateText: value,
-      timeText: "",
+      timeText: timeValue,
     };
   }
 
@@ -45,12 +45,34 @@ function formatBirthdayDate(value: string): {
       day: "numeric",
       year: "numeric",
     }),
-    timeText: parsedDate.toLocaleTimeString("en-US", {
+    timeText: timeValue || parsedDate.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     }),
   };
+}
+
+function getBirthdayGuestFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 10) return "text-[clamp(26px,6vw,52px)]";
+  if (len <= 18) return "text-[clamp(20px,4.5vw,36px)]";
+  if (len <= 28) return "text-[clamp(15px,3.2vw,24px)]";
+  return "text-[clamp(11px,2.2vw,16px)]";
+}
+
+function getBirthdayEventFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 12) return "text-[clamp(18px,3vw,28px)]";
+  if (len <= 24) return "text-[clamp(14px,2.4vw,20px)]";
+  return "text-[clamp(11px,1.8vw,15px)]";
+}
+
+function getBirthdayDetailFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 20) return "text-[clamp(12px,2vw,18px)]";
+  if (len <= 35) return "text-[clamp(10px,1.6vw,14px)]";
+  return "text-[clamp(8.5px,1.3vw,11px)]";
 }
 
 export default function SinhalaBirthdayTemplate({
@@ -62,7 +84,12 @@ export default function SinhalaBirthdayTemplate({
   category = "Birthday",
   language = "si",
 }: SinhalaBirthdayTemplateProps): ReactElement {
-  const { dateText, timeText } = formatBirthdayDate(date);
+  const { dateText, timeText } = formatBirthdayDate(date, time);
+  const isSinhala = language === "si";
+
+  const displayDate = dateText || "දිනය පසුව දැනුම් දෙනු ලැබේ";
+  const displayTime = timeText || "වේලාව පසුව දැනුම් දෙනු ලැබේ";
+  const displayLocation = location || "ස්ථානය පසුව දැනුම් දෙනු ලැබේ";
 
   return (
     <div
@@ -80,7 +107,7 @@ export default function SinhalaBirthdayTemplate({
       "
     >
       <div
-        lang="si"
+        lang={isSinhala ? "si" : "en"}
         className="
           relative
           aspect-[2/3]
@@ -102,13 +129,15 @@ export default function SinhalaBirthdayTemplate({
         <div
           className="
             absolute
-            inset-x-[18%]
-            top-[12%]
+            inset-x-[16%]
+            top-[10%]
             z-10
             flex
+            max-h-[75%]
             flex-col
             items-center
             text-center
+            overflow-hidden
           "
         >
           <p
@@ -124,58 +153,85 @@ export default function SinhalaBirthdayTemplate({
           </p>
 
           <h1
-            className="
-              mt-[12%]
+            className={`
+              mt-[6%]
               font-serif
-              text-[clamp(30px,7vw,58px)]
               font-bold
               leading-none
               text-[#8a71a4]
-            "
+              break-words
+              [overflow-wrap:anywhere]
+              ${getBirthdayGuestFontSize(guestName)}
+            `}
           >
             {guestName}
           </h1>
 
-          <div className="mt-[8%] flex items-center justify-center gap-3">
+          <div className="mt-[5%] flex items-center justify-center gap-3">
             <span className="h-px w-10 bg-[#cfb4d7]" />
             <span className="text-[clamp(14px,2vw,20px)] text-[#9d7bb3]">✦</span>
             <span className="h-px w-10 bg-[#cfb4d7]" />
           </div>
 
-          <div className="mt-[8%] space-y-2">
-            <p
-              className="
-                text-[clamp(12px,2vw,18px)]
-                font-medium
-                text-[#8c6ea1]
-              "
-            >
-              {dateText || "දිනය පසුව දැනුම් දෙනු ලැබේ"}
-            </p>
-            <p
-              className="
-                text-[clamp(12px,2vw,18px)]
-                font-medium
-                text-[#8c6ea1]
-              "
-            >
-              {timeText || "වේලාව පසුව දැනුම් දෙනු ලැබේ"}
-            </p>
-            <p
-              className="
-                text-[clamp(12px,2vw,18px)]
-                font-medium
-                text-[#8c6ea1]
-              "
-            >
-              {location || "ස්ථානය පසුව දැනුම් දෙනු ලැබේ"}
-            </p>
+          <div className="mt-[4%] space-y-1.5 w-full">
+            <div className="flex flex-col items-center">
+              <span className="text-[clamp(8px,1.2vw,10px)] font-semibold uppercase tracking-[0.2em] text-[#9d7bb3]">
+                දිනය
+              </span>
+              <p
+                className={`
+                  font-semibold
+                  text-[#8c6ea1]
+                  break-words
+                  [overflow-wrap:anywhere]
+                  ${getBirthdayDetailFontSize(displayDate)}
+                `}
+              >
+                {displayDate}
+              </p>
+            </div>
+
+            {displayTime && (
+              <div className="flex flex-col items-center mt-0.5">
+                <span className="text-[clamp(8px,1.2vw,10px)] font-semibold uppercase tracking-[0.2em] text-[#9d7bb3]">
+                  වේලාව
+                </span>
+                <p
+                  className={`
+                    font-semibold
+                    text-[#8c6ea1]
+                    break-words
+                    [overflow-wrap:anywhere]
+                    ${getBirthdayDetailFontSize(displayTime)}
+                  `}
+                >
+                  {displayTime}
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col items-center mt-0.5">
+              <span className="text-[clamp(8px,1.2vw,10px)] font-semibold uppercase tracking-[0.2em] text-[#9d7bb3]">
+                ස්ථානය
+              </span>
+              <p
+                className={`
+                  font-semibold
+                  text-[#8c6ea1]
+                  break-words
+                  [overflow-wrap:anywhere]
+                  ${getBirthdayDetailFontSize(displayLocation)}
+                `}
+              >
+                {displayLocation}
+              </p>
+            </div>
           </div>
 
-          <div className="mt-[10%]">
+          <div className="mt-[6%]">
             <p
               className="
-                text-[clamp(12px,2vw,18px)]
+                text-[clamp(11px,1.8vw,16px)]
                 font-serif
                 italic
                 text-[#8d6b9d]
@@ -184,28 +240,53 @@ export default function SinhalaBirthdayTemplate({
               ඔබට ආරාධනය
             </p>
             <p
-              className="
-                mt-2
-                text-[clamp(18px,3vw,28px)]
+              className={`
+                mt-1
                 font-semibold
                 text-[#7a5d8c]
-              "
+                break-words
+                [overflow-wrap:anywhere]
+                ${getBirthdayEventFontSize(eventName)}
+              `}
             >
               {eventName}
             </p>
           </div>
+
+          <p
+            className="
+              mt-[5%]
+              max-w-[85%]
+              text-[clamp(9.5px,1.6vw,13px)]
+              leading-relaxed
+              text-[#7a628b]
+            "
+          >
+            සතුට, සිනහව සහ සෙනෙහස පිරුණු මේ උදාවේ ඔබව අපිත් එක්ව සතුටෙන් සැමරීමට ඉතා ප්‍රසාද කරනවා.
+          </p>
         </div>
 
-        <div className="absolute inset-x-[14%] bottom-[12%] z-10 text-center">
+        <div className="absolute inset-x-[14%] bottom-[8%] z-10 text-center">
           <p
             className="
               font-serif
-              text-[clamp(14px,2vw,22px)]
+              text-[clamp(13px,1.8vw,19px)]
               italic
               text-[#8f6fa1]
             "
           >
             සියලු ප්‍රජාවක් එක්ව
+          </p>
+          <p
+            className="
+              mt-1
+              text-[clamp(9.5px,1.4vw,12px)]
+              uppercase
+              tracking-[0.18em]
+              text-[#8a709f]
+            "
+          >
+            ආදරයෙන් හා සතුටින්
           </p>
         </div>
       </div>

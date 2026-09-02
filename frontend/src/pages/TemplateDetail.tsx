@@ -15,6 +15,13 @@ import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 
+import WeddingInvitationTemplate from "../components/assets/wedding/WeddingInvitationTemplate";
+import SinhalaWeddingTemplate from "../components/assets/wedding/SinhalaWeddingTemplate";
+import BirthdayInvitationTemplate from "../components/assets/birthday/BirthdayInvitationTemplate";
+import SinhalaBirthdayTemplate from "../components/assets/birthday/SinhalaBirthdayTemplate";
+import OfficeInvitationTemplate from "../components/assets/office/OfficeInvitationTemplate";
+import SinhalaOfficeInvitationTemplate from "../components/assets/office/SinhalaOfficeInvitationTemplate";
+
 import type { Template } from "../types";
 
 const sampleData: Record<string, Record<string, string>> = {
@@ -391,10 +398,66 @@ export function TemplateDetail(): React.ReactElement {
                   sm:p-4
                 "
               >
-                <TemplateRenderer
-                  designSchema={schema}
-                  fieldData={previewData}
-                />
+                {template.name === "English Wedding" ? (
+                  <WeddingInvitationTemplate
+                    eventName="Sarah & Michael"
+                    location="The Grand Wedding Garden"
+                    date="2026-10-15T18:00:00"
+                    category="Wedding"
+                    language="en"
+                  />
+                ) : template.name === "Sinhala Wedding" ? (
+                  <SinhalaWeddingTemplate
+                    eventName="කසුන් සහ නිමාලි"
+                    location="ග්‍රෑන්ඩ් වෙඩින් හෝටලය"
+                    date="2026-10-15T18:00:00"
+                    category="Wedding"
+                    language="si"
+                  />
+                ) : template.name === "English Birthday" ? (
+                  <BirthdayInvitationTemplate
+                    eventName="Lucas's Birthday Celebration"
+                    guestName="Lucas"
+                    date="2026-09-20T15:00:00"
+                    location="Skyline Celebration Hall"
+                    category="Birthday"
+                    language="en"
+                  />
+                ) : template.name === "Sinhala Birthday" ? (
+                  <SinhalaBirthdayTemplate
+                    eventName="විශේෂ උපන් දින සැමරුම"
+                    guestName="නෙත්මි"
+                    date="2026-09-20T15:00:00"
+                    location="කොළඹ"
+                    category="Birthday"
+                    language="si"
+                  />
+                ) : template.name === "English Office" ? (
+                  <OfficeInvitationTemplate
+                    eventName="Future Innovation Summit"
+                    companyName="Nexus Technologies"
+                    guestName="Alex"
+                    location="Grand Conference Hall"
+                    date="2026-12-05T19:30:00"
+                    category="Office"
+                    language="en"
+                  />
+                ) : template.name === "Sinhala Office" ? (
+                  <SinhalaOfficeInvitationTemplate
+                    eventName="නවෝත්පාදන හා තාක්ෂණ සමුළුව"
+                    companyName="Nexus Technologies"
+                    guestName="අලෙක්ස්"
+                    location="කොළඹ සම්මන්ත්‍රණ ශාලාව"
+                    date="2026-12-05T19:30:00"
+                    category="Office"
+                    language="si"
+                  />
+                ) : (
+                  <TemplateRenderer
+                    designSchema={schema}
+                    fieldData={previewData}
+                  />
+                )}
               </div>
             </div>
           </section>

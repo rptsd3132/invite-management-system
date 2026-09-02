@@ -54,6 +54,33 @@ function formatWeddingDate(value: string): {
   };
 }
 
+function getWeddingTitleFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 8) return "text-[clamp(22px,4.5vw,36px)]";
+  if (len <= 15) return "text-[clamp(16px,3.2vw,24px)]";
+  if (len <= 25) return "text-[clamp(13px,2.4vw,18px)]";
+  if (len <= 40) return "text-[clamp(10px,1.8vw,14px)]";
+  if (len <= 60) return "text-[clamp(8.5px,1.4vw,11px)]";
+  return "text-[clamp(7px,1.1vw,9.5px)]";
+}
+
+function getWeddingDateFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 15) return "text-[clamp(13px,2.3vw,19px)]";
+  if (len <= 28) return "text-[clamp(11px,1.8vw,15px)]";
+  if (len <= 45) return "text-[clamp(9px,1.4vw,12px)]";
+  return "text-[clamp(7.5px,1.1vw,9.5px)]";
+}
+
+function getWeddingLocationFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 15) return "text-[clamp(12px,2vw,16px)]";
+  if (len <= 30) return "text-[clamp(10px,1.6vw,13px)]";
+  if (len <= 50) return "text-[clamp(8.5px,1.3vw,11px)]";
+  if (len <= 80) return "text-[clamp(7.5px,1.1vw,9.5px)]";
+  return "text-[clamp(6.5px,0.9vw,8.5px)]";
+}
+
 export default function WeddingInvitationTemplate({
   eventName,
   location,
@@ -63,6 +90,10 @@ export default function WeddingInvitationTemplate({
 }: WeddingInvitationTemplateProps): ReactElement {
   const { dateText, timeText } = formatWeddingDate(date);
   const isSinhala = language === "si";
+
+  const displayTitle = eventName || (isSinhala ? "විවාහ මංගල්‍යය" : "Wedding Celebration");
+  const displayDate = dateText || (isSinhala ? "දිනය පසුව දැනුම් දෙනු ලැබේ" : "Date to be announced");
+  const displayLocation = location || (isSinhala ? "ස්ථානය පසුව දැනුම් දෙනු ලැබේ" : "Venue to be announced");
 
   return (
     <div
@@ -111,43 +142,42 @@ export default function WeddingInvitationTemplate({
         <div
           className="
             absolute
-            left-[20%]
-            right-[20%]
-            top-[19%]
+            left-[12%]
+            right-[12%]
+            top-[14%]
+            bottom-[42%]
             z-10
             flex
-            h-[43%]
             flex-col
             items-center
+            justify-around
             text-center
           "
         >
           <p
             className="
-              text-[clamp(8px,1.4vw,12px)]
+              text-[clamp(8px,1.4vw,11px)]
               font-semibold
               uppercase
-              tracking-[0.32em]
+              tracking-[0.3em]
               text-[#92713e]
             "
           >
             {category}
           </p>
 
-          <div className="mt-[3%] flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3">
             <span className="h-px w-8 bg-[#b99a63]" />
-            <span className="text-[clamp(12px,2vw,18px)] text-[#98733c]">❦</span>
+            <span className="text-[clamp(11px,1.8vw,16px)] text-[#98733c]">❦</span>
             <span className="h-px w-8 bg-[#b99a63]" />
           </div>
 
           <p
             className="
-              mt-[4%]
-              text-[clamp(8px,1.5vw,12px)]
+              text-[clamp(7.5px,1.3vw,10px)]
               font-medium
               uppercase
-              leading-relaxed
-              tracking-[0.16em]
+              tracking-[0.14em]
               text-[#81633c]
             "
           >
@@ -157,60 +187,34 @@ export default function WeddingInvitationTemplate({
           </p>
 
           <h1
-            className="
-              mt-[4%]
+            className={`
               w-full
               break-words
+              [overflow-wrap:anywhere]
               font-serif
-              text-[clamp(25px,5vw,45px)]
               font-semibold
               leading-[1.05]
-              tracking-[-0.025em]
+              tracking-[-0.02em]
               text-[#704822]
-            "
+              ${getWeddingTitleFontSize(displayTitle)}
+            `}
           >
-            {eventName ||
-              (isSinhala
-                ? "විවාහ මංගල්‍යය"
-                : "Wedding Celebration")}
+            {displayTitle}
           </h1>
 
-          <div className="mt-[5%] flex items-center justify-center gap-2">
-            <span
-              className="
-                h-px
-                w-10
-                bg-gradient-to-r
-                from-transparent
-                to-[#b08a50]
-              "
-            />
-            <span
-              className="
-                text-[clamp(10px,1.8vw,15px)]
-                text-[#9b743e]
-              "
-            >
-              ✦
-            </span>
-            <span
-              className="
-                h-px
-                w-10
-                bg-gradient-to-l
-                from-transparent
-                to-[#b08a50]
-              "
-            />
+          <div className="flex items-center justify-center gap-2">
+            <span className="h-px w-8 bg-gradient-to-r from-transparent to-[#b08a50]" />
+            <span className="text-[clamp(8px,1.4vw,12px)] text-[#9b743e]">✦</span>
+            <span className="h-px w-8 bg-gradient-to-l from-transparent to-[#b08a50]" />
           </div>
 
-          <div className="mt-[5%] w-full">
+          <div className="w-full">
             <p
               className="
-                text-[clamp(8px,1.3vw,11px)]
+                text-[clamp(7px,1.1vw,9.5px)]
                 font-semibold
                 uppercase
-                tracking-[0.22em]
+                tracking-[0.2em]
                 text-[#9a7948]
               "
             >
@@ -218,30 +222,29 @@ export default function WeddingInvitationTemplate({
             </p>
 
             <p
-              className="
-                mt-1
+              className={`
+                mt-0.5
                 font-serif
-                text-[clamp(13px,2.3vw,19px)]
                 font-semibold
-                leading-snug
+                leading-tight
                 text-[#674824]
-              "
+                break-words
+                [overflow-wrap:anywhere]
+                ${getWeddingDateFontSize(displayDate)}
+              `}
             >
-              {dateText ||
-                (isSinhala
-                  ? "දිනය පසුව දැනුම් දෙනු ලැබේ"
-                  : "Date to be announced")}
+              {displayDate}
             </p>
           </div>
 
           {timeText && (
-            <div className="mt-[3%]">
+            <div>
               <p
                 className="
-                  text-[clamp(8px,1.3vw,11px)]
+                  text-[clamp(7px,1.1vw,9.5px)]
                   font-semibold
                   uppercase
-                  tracking-[0.22em]
+                  tracking-[0.2em]
                   text-[#9a7948]
                 "
               >
@@ -250,8 +253,8 @@ export default function WeddingInvitationTemplate({
 
               <p
                 className="
-                  mt-1
-                  text-[clamp(12px,2vw,17px)]
+                  mt-0.5
+                  text-[clamp(10px,1.6vw,14px)]
                   font-semibold
                   text-[#674824]
                 "
@@ -261,46 +264,10 @@ export default function WeddingInvitationTemplate({
             </div>
           )}
 
-          <div className="mt-[4%] w-full">
-            <div
-              className="
-                mx-auto
-                flex
-                h-6
-                w-6
-                items-center
-                justify-center
-                rounded-full
-                border
-                border-[#b79a69]
-                text-[#8a6838]
-              "
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                className="h-3.5 w-3.5"
-                stroke="currentColor"
-                strokeWidth="1.8"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="
-                    M12 21
-                    s6-4.35 6-11
-                    a6 6 0 1 0-12 0
-                    c0 6.65 6 11 6 11Z
-                  "
-                />
-                <circle cx="12" cy="10" r="2.25" />
-              </svg>
-            </div>
-
+          <div className="w-full">
             <p
               className="
-                mt-1.5
-                text-[clamp(8px,1.3vw,11px)]
+                text-[clamp(7px,1.1vw,9.5px)]
                 font-semibold
                 uppercase
                 tracking-[0.2em]
@@ -311,38 +278,21 @@ export default function WeddingInvitationTemplate({
             </p>
 
             <p
-              className="
+              className={`
                 mx-auto
-                mt-1
+                mt-0.5
                 max-w-[95%]
                 break-words
-                text-[clamp(11px,1.9vw,16px)]
+                [overflow-wrap:anywhere]
                 font-semibold
-                leading-snug
+                leading-tight
                 text-[#674824]
-              "
+                ${getWeddingLocationFontSize(displayLocation)}
+              `}
             >
-              {location ||
-                (isSinhala
-                  ? "ස්ථානය පසුව දැනුම් දෙනු ලැබේ"
-                  : "Venue to be announced")}
+              {displayLocation}
             </p>
           </div>
-
-          <p
-            className="
-              mt-[5%]
-              font-serif
-              text-[clamp(9px,1.5vw,13px)]
-              italic
-              leading-relaxed
-              text-[#876b46]
-            "
-          >
-            {isSinhala
-              ? "ඔබගේ පැමිණීම අපගේ විශේෂ දිනය තවත් සුන්දර කරයි"
-              : "We request the pleasure of your company"}
-          </p>
         </div>
       </div>
     </div>

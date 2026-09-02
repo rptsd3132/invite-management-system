@@ -13,12 +13,12 @@ interface OfficeInvitationTemplateProps {
   language?: "en" | "si";
 }
 
-function formatOfficeDate(value: string): {
+function formatOfficeDate(value: string, timeValue = ""): {
   dateText: string;
   timeText: string;
 } {
   if (!value) {
-    return { dateText: "", timeText: "" };
+    return { dateText: "", timeText: timeValue };
   }
 
   const parsedDate = new Date(value);
@@ -29,13 +29,13 @@ function formatOfficeDate(value: string): {
     if (atIndex !== -1) {
       return {
         dateText: value.slice(0, atIndex).trim(),
-        timeText: value.slice(atIndex + 4).trim(),
+        timeText: timeValue || value.slice(atIndex + 4).trim(),
       };
     }
 
     return {
       dateText: value,
-      timeText: "",
+      timeText: timeValue,
     };
   }
 
@@ -46,12 +46,34 @@ function formatOfficeDate(value: string): {
       day: "numeric",
       year: "numeric",
     }),
-    timeText: parsedDate.toLocaleTimeString("en-US", {
+    timeText: timeValue || parsedDate.toLocaleTimeString("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     }),
   };
+}
+
+function getOfficeCompanyFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 12) return "text-[clamp(24px,5.5vw,46px)]";
+  if (len <= 22) return "text-[clamp(18px,4vw,32px)]";
+  if (len <= 35) return "text-[clamp(14px,2.8vw,22px)]";
+  return "text-[clamp(11px,2vw,16px)]";
+}
+
+function getOfficeGuestFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 15) return "text-[clamp(22px,3.8vw,34px)]";
+  if (len <= 28) return "text-[clamp(16px,2.8vw,24px)]";
+  return "text-[clamp(12px,2vw,17px)]";
+}
+
+function getOfficeEventFontSize(text: string): string {
+  const len = text ? text.trim().length : 0;
+  if (len <= 16) return "text-[clamp(16px,2.8vw,26px)]";
+  if (len <= 30) return "text-[clamp(13px,2.2vw,19px)]";
+  return "text-[clamp(10px,1.6vw,14px)]";
 }
 
 export default function OfficeInvitationTemplate({
@@ -64,8 +86,12 @@ export default function OfficeInvitationTemplate({
   category = "Office",
   language = "en",
 }: OfficeInvitationTemplateProps): ReactElement {
-  const { dateText, timeText } = formatOfficeDate(date);
+  const { dateText, timeText } = formatOfficeDate(date, time);
   const isSinhala = language === "si";
+
+  const displayDate = dateText || (isSinhala ? "දිනය පසුව දැනුම් දෙනු ලැබේ" : "To be announced");
+  const displayTime = timeText || (isSinhala ? "වේලාව පසුව දැනුම් දෙනු ලැබේ" : "To be announced");
+  const displayLocation = location || (isSinhala ? "ස්ථානය පසුව දැනුම් දෙනු ලැබේ" : "To be announced");
 
   return (
     <div
@@ -105,10 +131,12 @@ export default function OfficeInvitationTemplate({
         <div
           className="
             absolute
-            inset-x-[12%]
-            top-[10%]
+            inset-x-[10%]
+            top-[8%]
             z-10
             text-center
+            max-h-[30%]
+            overflow-hidden
           "
         >
           <p
@@ -124,18 +152,20 @@ export default function OfficeInvitationTemplate({
           </p>
 
           <h1
-            className="
-              mt-5
-              text-[clamp(28px,6vw,52px)]
+            className={`
+              mt-3
               font-bold
-              tracking-[-0.04em]
+              tracking-[-0.03em]
               text-[#162c4e]
-            "
+              break-words
+              [overflow-wrap:anywhere]
+              ${getOfficeCompanyFontSize(companyName)}
+            `}
           >
             {companyName}
           </h1>
 
-          <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-3 flex items-center justify-center gap-3">
             <span className="h-px w-12 bg-[#7fa4d6]" />
             <span className="text-[#2f4d77]">✦</span>
             <span className="h-px w-12 bg-[#7fa4d6]" />
@@ -143,11 +173,11 @@ export default function OfficeInvitationTemplate({
 
           <p
             className="
-              mt-5
-              text-[clamp(13px,2vw,18px)]
+              mt-3
+              text-[clamp(11px,1.8vw,15px)]
               font-medium
               uppercase
-              tracking-[0.2em]
+              tracking-[0.18em]
               text-[#33517a]
             "
           >
@@ -158,32 +188,57 @@ export default function OfficeInvitationTemplate({
         <div
           className="
             absolute
-            inset-x-[16%]
-            top-[38%]
+            inset-x-[14%]
+            top-[36%]
             z-10
+            max-h-[38%]
+            overflow-hidden
             rounded-3xl
             border
             border-white/50
             bg-white/75
-            p-5
+            p-4
             text-center
             shadow-lg
             backdrop-blur-sm
           "
         >
-          <p className="text-sm uppercase tracking-[0.26em] text-slate-500">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">
             {isSinhala ? "ආගන්තුකයා" : "Guest"}
           </p>
-          <h2 className="mt-3 text-[clamp(24px,4vw,38px)] font-bold text-[#1d3557]">
+          <h2
+            className={`
+              mt-2
+              font-bold
+              text-[#1d3557]
+              break-words
+              [overflow-wrap:anywhere]
+              ${getOfficeGuestFontSize(guestName)}
+            `}
+          >
             {guestName}
           </h2>
 
-          <div className="mt-4">
-            <p className="text-[clamp(12px,2vw,16px)] font-medium text-slate-700">
+          <div className="mt-3">
+            <p className="text-[clamp(11px,1.8vw,14px)] font-medium text-slate-700">
               {isSinhala ? "ඔබව අපගේ උත්සවයට ආරාධනා කරයි" : "You are warmly invited to"}
             </p>
-            <p className="mt-2 text-[clamp(18px,3vw,28px)] font-bold text-[#1d3557]">
+            <p
+              className={`
+                mt-1
+                font-bold
+                text-[#1d3557]
+                break-words
+                [overflow-wrap:anywhere]
+                ${getOfficeEventFontSize(eventName)}
+              `}
+            >
               {eventName}
+            </p>
+            <p className="mt-2 text-[clamp(10px,1.5vw,13px)] leading-relaxed text-slate-600">
+              {isSinhala
+                ? "අපගේ මෙහෙයුම, සම්බන්ධතාවය සහ ඉලක්කය පිරිනැමීමේ අරමුණින් ගොඩනැගුණු මෙම අවස්ථාවට ඔබේ පැමිණීම අපි බොහෝ ප්‍රසන්නව සලකයි."
+                : "Your presence would be a valued part of this occasion as we gather to celebrate shared success."}
             </p>
           </div>
         </div>
@@ -191,32 +246,32 @@ export default function OfficeInvitationTemplate({
         <div
           className="
             absolute
-            inset-x-[16%]
-            bottom-[12%]
+            inset-x-[14%]
+            bottom-[8%]
             z-10
             grid
-            gap-3
+            gap-2
           "
         >
-          <div className="rounded-2xl bg-slate-900/90 px-4 py-3 text-white shadow-md">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-slate-300">
+          <div className="rounded-xl bg-slate-900/90 px-3.5 py-2 text-white shadow-md">
+            <p className="text-[9.5px] uppercase tracking-[0.22em] text-slate-300">
               {isSinhala ? "දිනය" : "Date"}
             </p>
-            <p className="mt-1 text-base font-semibold">{dateText || "To be announced"}</p>
+            <p className="mt-0.5 text-sm font-semibold break-words [overflow-wrap:anywhere]">{displayDate}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/85 px-4 py-3 text-slate-800 shadow-md ring-1 ring-slate-200">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
+          <div className="rounded-xl bg-white/85 px-3.5 py-2 text-slate-800 shadow-md ring-1 ring-slate-200">
+            <p className="text-[9.5px] uppercase tracking-[0.22em] text-slate-500">
               {isSinhala ? "වේලාව" : "Time"}
             </p>
-            <p className="mt-1 text-base font-semibold">{timeText || "To be announced"}</p>
+            <p className="mt-0.5 text-sm font-semibold break-words [overflow-wrap:anywhere]">{displayTime}</p>
           </div>
 
-          <div className="rounded-2xl bg-white/85 px-4 py-3 text-slate-800 shadow-md ring-1 ring-slate-200">
-            <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
+          <div className="rounded-xl bg-white/85 px-3.5 py-2 text-slate-800 shadow-md ring-1 ring-slate-200">
+            <p className="text-[9.5px] uppercase tracking-[0.22em] text-slate-500">
               {isSinhala ? "ස්ථානය" : "Venue"}
             </p>
-            <p className="mt-1 text-base font-semibold">{location || "To be announced"}</p>
+            <p className="mt-0.5 text-sm font-semibold break-words [overflow-wrap:anywhere]">{displayLocation}</p>
           </div>
         </div>
       </div>

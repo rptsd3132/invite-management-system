@@ -5,13 +5,10 @@ import { UploadCloud, ArrowRight } from "lucide-react";
 import { getTemplates } from "../lib/api";
 import { Card } from "../components/ui/Card";
 import { TemplateCard } from "../components/TemplateCard";
-import { DynamicTemplateCarousel } from "../components/ui/DynamicTemplateCarousel";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
-import traditionalWeddingTemplate from "../components/assets/wedding/assets/traditional-wedding-template.png";
-import birthdayTemplate from "../components/assets/birthday/assets/Purple and Pink Watercolor Birthday Invitation.png";
-import officeTemplate from "../components/assets/office/assets/office-ai-template.png";
+
 function SkeletonCard(): React.ReactElement {
   return (
     <div className="animate-pulse snap-start shrink-0 w-64 md:w-72 rounded-xl border border-neutral-200 bg-white overflow-hidden">
@@ -42,26 +39,15 @@ export function Dashboard(): React.ReactElement {
     queryFn: getTemplates,
   });
 
-  const categoryPreviewImages: Record<string, string> = {
-  Wedding: traditionalWeddingTemplate,
-  Birthday: birthdayTemplate,
-  Office: officeTemplate,
-};
-
-const categoryCards = useMemo(() => {
-  if (!templates) return [];
-
-  const grouped = groupByCategory(templates);
-
-  return Array.from(grouped.entries()).map(
-    ([category, template], idx) => ({
+  const categoryCards = useMemo(() => {
+    if (!templates) return [];
+    const grouped = groupByCategory(templates);
+    return Array.from(grouped.entries()).map(([category, template], idx) => ({
       category,
-      thumbnailUrl:
-        categoryPreviewImages[category] ?? template.thumbnail_url,
+      thumbnailUrl: template.thumbnail_url,
       index: idx,
-    }),
-  );
-}, [templates]);
+    }));
+  }, [templates]);
 
   const uniqueCategories = useMemo(() => {
     if (!templates) return [];
@@ -71,6 +57,10 @@ const categoryCards = useMemo(() => {
       seen.add(t.category);
       return true;
     }).map((t) => t.category);
+  }, [templates]);
+
+  const heroThumbnails = useMemo(() => {
+    return templates?.filter((t): t is Template & { thumbnail_url: string } => t.thumbnail_url !== null).slice(0, 2) ?? [];
   }, [templates]);
 
   const scrollToGallery = (): void => {
@@ -102,12 +92,36 @@ const categoryCards = useMemo(() => {
 
       {/* Hero */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-16 rounded-2xl bg-neutral-100/60 p-6 md:p-10">
-        {/* Left — dynamic template carousel */}
-        <div className="w-full">
-          {templates && templates.length > 0 ? (
-            <DynamicTemplateCarousel templates={templates} />
+        {/* Left — decorative image area */}
+        <div className="relative h-64 md:h-80 w-full">
+          {heroThumbnails.length > 0 ? (
+            <>
+              <div className="absolute top-4 left-2 w-48 sm:w-56 -rotate-3 shadow-lg rounded-xl overflow-hidden bg-white">
+                <img
+                  src={heroThumbnails[0].thumbnail_url}
+                  alt=""
+                  className="w-full aspect-[4/3] object-cover"
+                />
+              </div>
+              {heroThumbnails.length > 1 && (
+                <div className="absolute bottom-4 right-2 w-40 sm:w-48 rotate-2 shadow-lg rounded-xl overflow-hidden bg-white">
+                  <img
+                    src={heroThumbnails[1].thumbnail_url}
+                    alt=""
+                    className="w-full aspect-[4/3] object-cover"
+                  />
+                </div>
+              )}
+            </>
           ) : (
-            <div className="aspect-[3/4] md:aspect-[4/3] rounded-2xl bg-gradient-to-br from-pastel-peach to-pastel-blush" />
+            <>
+              <div className="absolute top-4 left-2 w-48 sm:w-56 -rotate-3 shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-pastel-peach to-pastel-blush">
+                <div className="aspect-[4/3]" />
+              </div>
+              <div className="absolute bottom-4 right-2 w-40 sm:w-48 rotate-2 shadow-lg rounded-xl overflow-hidden bg-gradient-to-br from-pastel-sky to-pastel-lilac">
+                <div className="aspect-[4/3]" />
+              </div>
+            </>
           )}
         </div>
 

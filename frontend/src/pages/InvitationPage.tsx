@@ -8,6 +8,13 @@ import WeddingInvitation from "../components/assets/wedding/WeddingInvitation";
 import BirthdayInvitation from "../components/assets/birthday/BirthdayInvitation";
 import OfficeInvitation from "../components/assets/office/OfficeInvitation";
 
+import WeddingInvitationTemplate from "../components/assets/wedding/WeddingInvitationTemplate";
+import SinhalaWeddingTemplate from "../components/assets/wedding/SinhalaWeddingTemplate";
+import BirthdayInvitationTemplate from "../components/assets/birthday/BirthdayInvitationTemplate";
+import SinhalaBirthdayTemplate from "../components/assets/birthday/SinhalaBirthdayTemplate";
+import OfficeInvitationTemplate from "../components/assets/office/OfficeInvitationTemplate";
+import SinhalaOfficeInvitationTemplate from "../components/assets/office/SinhalaOfficeInvitationTemplate";
+
 import {
   formatInvitationDate,
   getInvitationCopy,
@@ -114,19 +121,112 @@ export function InvitationPage(): React.ReactElement {
   } = data;
 
   const category = template?.design_schema?.category ?? "Wedding";
+  const templateName = template?.name ?? "";
   const eventName = event.event_name;
   const guestName = participant.guest_name;
   const brideName = localizedFieldData.bride_name ?? "Bride";
   const groomName = localizedFieldData.groom_name ?? "Groom";
   const birthdayPerson = localizedFieldData.birthday_person_name ?? localizedFieldData.birthday_person ?? "Birthday Star";
   const companyName = localizedFieldData.company_name ?? event.company_name ?? "Company";
-  const invitationCard = (
-    <TemplateRenderer
-      designSchema={template.design_schema}
-      fieldData={localizedFieldData}
-      language={language}
-    />
-  );
+  const locationValue =
+    event.location ||
+    event.address ||
+    localizedFieldData.event_location ||
+    localizedFieldData.location ||
+    localizedFieldData.from_location ||
+    localizedFieldData.venue ||
+    localizedFieldData.address ||
+    "";
+
+  const renderInvitationCard = (): React.ReactElement => {
+    if (templateName === "English Wedding" || (category === "Wedding" && language === "en")) {
+      return (
+        <WeddingInvitationTemplate
+          eventName={eventName}
+          location={locationValue}
+          date={event.event_date}
+          category="Wedding"
+          language="en"
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Wedding" || (category === "Wedding" && language === "si")) {
+      return (
+        <SinhalaWeddingTemplate
+          eventName={eventName}
+          location={locationValue}
+          date={event.event_date}
+          category="Wedding"
+          language="si"
+        />
+      );
+    }
+
+    if (templateName === "English Birthday" || (category === "Birthday" && language === "en")) {
+      return (
+        <BirthdayInvitationTemplate
+          guestName={guestName}
+          eventName={eventName}
+          date={event.event_date}
+          location={locationValue}
+          category="Birthday"
+          language="en"
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Birthday" || (category === "Birthday" && language === "si")) {
+      return (
+        <SinhalaBirthdayTemplate
+          guestName={guestName}
+          eventName={eventName}
+          date={event.event_date}
+          location={locationValue}
+          category="Birthday"
+          language="si"
+        />
+      );
+    }
+
+    if (templateName === "English Office" || (category === "Office" && language === "en")) {
+      return (
+        <OfficeInvitationTemplate
+          guestName={guestName}
+          eventName={eventName}
+          companyName={companyName}
+          date={event.event_date}
+          location={locationValue}
+          category="Office"
+          language="en"
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Office" || (category === "Office" && language === "si")) {
+      return (
+        <SinhalaOfficeInvitationTemplate
+          guestName={guestName}
+          eventName={eventName}
+          companyName={companyName}
+          date={event.event_date}
+          location={locationValue}
+          category="Office"
+          language="si"
+        />
+      );
+    }
+
+    return (
+      <TemplateRenderer
+        designSchema={template.design_schema}
+        fieldData={localizedFieldData}
+        language={language}
+      />
+    );
+  };
+
+  const invitationCard = renderInvitationCard();
 
   const OpeningAnimation =
     category === "Birthday"
