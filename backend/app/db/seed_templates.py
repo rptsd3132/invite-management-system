@@ -914,6 +914,36 @@ TEMPLATES_DATA = [
     ),
 
     make_template(
+        "Kasun & Nethmi Wedding",
+        "Wedding",
+        "/templates/wedding/traditional-wedding-template.png",
+        "wedding-botanical",
+        WEDDING_FIELDS,
+        {
+            "bride_name": text_pos(
+                50, 30, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "groom_name": text_pos(
+                50, 50, 58, "hero", "#F6DA84",
+                family="serif", weight=600,
+            ),
+            "event_date_time": text_pos(
+                50, 67, 58, "xs", "#F8E7B0",
+                family="sans", weight=600,
+            ),
+            "event_location": text_pos(
+                50, 74, 60, "xs", "#F8E7B0",
+                family="sans", weight=500,
+            ),
+            "participant_name": text_pos(
+                50, 84, 56, "sm", "#FFFFFF",
+                family="serif", weight=600,
+            ),
+        },
+    ),
+
+    make_template(
         "English Birthday",
         "Birthday",
         "/templates/birthday/Purple and Pink Watercolor Birthday Invitation.png",

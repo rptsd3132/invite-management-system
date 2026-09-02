@@ -9,9 +9,7 @@ import { DynamicTemplateCarousel } from "../components/ui/DynamicTemplateCarouse
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
-import traditionalWeddingTemplate from "../components/assets/wedding/assets/traditional-wedding-template.png";
-import birthdayTemplate from "../components/assets/birthday/assets/Purple and Pink Watercolor Birthday Invitation.png";
-import officeTemplate from "../components/assets/office/assets/office-ai-template.png";
+const traditionalWeddingTemplate = "/templates/wedding/traditional-wedding-template.png";
 function SkeletonCard(): React.ReactElement {
   return (
     <div className="animate-pulse snap-start shrink-0 w-64 md:w-72 rounded-xl border border-neutral-200 bg-white overflow-hidden">
@@ -42,10 +40,10 @@ export function Dashboard(): React.ReactElement {
     queryFn: getTemplates,
   });
 
-  const categoryPreviewImages: Record<string, string> = {
+  const categoryPreviewImages: Record<string, string | null> = {
   Wedding: traditionalWeddingTemplate,
-  Birthday: birthdayTemplate,
-  Office: officeTemplate,
+    Birthday: null,
+  Office: null,
 };
 
 const categoryCards = useMemo(() => {
@@ -56,8 +54,9 @@ const categoryCards = useMemo(() => {
   return Array.from(grouped.entries()).map(
     ([category, template], idx) => ({
       category,
-      thumbnailUrl:
-        categoryPreviewImages[category] ?? template.thumbnail_url,
+      thumbnailUrl: Object.prototype.hasOwnProperty.call(categoryPreviewImages, category)
+        ? categoryPreviewImages[category]
+        : template.thumbnail_url,
       index: idx,
     }),
   );

@@ -4,14 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getTemplates } from "../../lib/api";
 import { TemplateCard } from "../../components/TemplateCard";
 
-import WeddingInvitationTemplate from "../../components/assets/wedding/WeddingInvitationTemplate";
-import SinhalaWeddingTemplate from "../../components/assets/wedding/SinhalaWeddingTemplate";
+import KasunNethmiExactWeddingTemplate from "../../components/assets/wedding/KasunNethmiExactWeddingTemplate";
 
-import BirthdayInvitationTemplate from "../../components/assets/birthday/BirthdayInvitationTemplate";
-import SinhalaBirthdayTemplate from "../../components/assets/birthday/SinhalaBirthdayTemplate";
+import EnglishBirthdayInvitationTemplate from "../../components/assets/birthday/EnglishBirthdayInvitationTemplate";
+import SinhalaBirthdayInvitationTemplate from "../../components/assets/birthday/SinhalaBirthdayInvitationTemplate";
 
-import OfficeInvitationTemplate from "../../components/assets/office/OfficeInvitationTemplate";
-import SinhalaOfficeInvitationTemplate from "../../components/assets/office/SinhalaOfficeInvitationTemplate";
+import EnglishCorporateGalaInvitationTemplate from "../../components/assets/office/EnglishCorporateGalaInvitationTemplate";
+import SinhalaCorporateGalaInvitationTemplate from "../../components/assets/office/SinhalaCorporateGalaInvitationTemplate";
 
 import type { WizardAction, WizardState } from "./CreateEventWizard";
 
@@ -26,8 +25,7 @@ interface Props {
    ========================================================= */
 
 const ACTIVE_TEMPLATE_NAMES = new Set([
-  "English Wedding",
-  "Sinhala Wedding",
+  "Kasun & Nethmi Wedding",
   "English Birthday",
   "Sinhala Birthday",
   "English Office",
@@ -223,27 +221,12 @@ export function TemplateSelectionStep({
       return null;
     }
 
-    const templateKind = getTemplateKind(
-      selectedTemplate.name,
-      selectedTemplate.category,
-    );
-
-    if (templateKind === "wedding-si") {
+    if (selectedTemplate.name === "Kasun & Nethmi Wedding") {
       return (
-        <SinhalaWeddingTemplate
+        <KasunNethmiExactWeddingTemplate
           eventName={eventName}
-          location={location}
-          date={eventDate}
-          category="Wedding"
-          language="si"
-        />
-      );
-    }
-
-    if (templateKind === "wedding-en") {
-      return (
-        <WeddingInvitationTemplate
-          eventName={eventName}
+          groomName={groomName}
+          brideName={brideName}
           location={location}
           date={eventDate}
           category="Wedding"
@@ -252,9 +235,14 @@ export function TemplateSelectionStep({
       );
     }
 
+    const templateKind = getTemplateKind(
+      selectedTemplate.name,
+      selectedTemplate.category,
+    );
+
     if (templateKind === "birthday-si") {
       return (
-        <SinhalaBirthdayTemplate
+        <SinhalaBirthdayInvitationTemplate
           eventName={eventName}
           birthdayPerson={birthdayPerson}
           age={age}
@@ -268,7 +256,7 @@ export function TemplateSelectionStep({
 
     if (templateKind === "birthday-en") {
       return (
-        <BirthdayInvitationTemplate
+        <EnglishBirthdayInvitationTemplate
           eventName={eventName}
           birthdayPerson={birthdayPerson}
           age={age}
@@ -282,7 +270,7 @@ export function TemplateSelectionStep({
 
     if (templateKind === "office-si") {
       return (
-        <SinhalaOfficeInvitationTemplate
+        <SinhalaCorporateGalaInvitationTemplate
           eventName={eventName}
           companyName={companyName}
           location={location}
@@ -294,7 +282,7 @@ export function TemplateSelectionStep({
     }
 
     return (
-      <OfficeInvitationTemplate
+      <EnglishCorporateGalaInvitationTemplate
         eventName={eventName}
         companyName={companyName}
         location={location}
