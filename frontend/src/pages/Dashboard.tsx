@@ -8,7 +8,7 @@ import { TemplateCard } from "../components/TemplateCard";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 import type { Template } from "../types";
-
+const traditionalWeddingTemplate = "/templates/wedding/traditional-wedding-template.png";
 function SkeletonCard(): React.ReactElement {
   return (
     <div className="animate-pulse snap-start shrink-0 w-64 md:w-72 rounded-xl border border-neutral-200 bg-white overflow-hidden">
@@ -39,12 +39,20 @@ export function Dashboard(): React.ReactElement {
     queryFn: getTemplates,
   });
 
+  const categoryPreviewImages: Record<string, string | null> = {
+    Wedding: traditionalWeddingTemplate,
+    Birthday: null,
+    Office: null,
+  };
+
   const categoryCards = useMemo(() => {
     if (!templates) return [];
     const grouped = groupByCategory(templates);
     return Array.from(grouped.entries()).map(([category, template], idx) => ({
       category,
-      thumbnailUrl: template.thumbnail_url,
+      thumbnailUrl: Object.prototype.hasOwnProperty.call(categoryPreviewImages, category)
+        ? categoryPreviewImages[category]
+        : template.thumbnail_url,
       index: idx,
     }));
   }, [templates]);

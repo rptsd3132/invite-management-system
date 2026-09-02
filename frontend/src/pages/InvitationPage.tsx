@@ -4,16 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, MapPin, Check, Heart } from "lucide-react";
 import { getInvitationByToken, updateRsvpStatus } from "../lib/api";
 import { TemplateRenderer } from "../components/ui/TemplateRenderer";
-import WeddingInvitation from "../components/assets/wedding/WeddingInvitation";
-import BirthdayInvitation from "../components/assets/birthday/BirthdayInvitation";
-import OfficeInvitation from "../components/assets/office/OfficeInvitation";
-
-import WeddingInvitationTemplate from "../components/assets/wedding/WeddingInvitationTemplate";
-import SinhalaWeddingTemplate from "../components/assets/wedding/SinhalaWeddingTemplate";
-import BirthdayInvitationTemplate from "../components/assets/birthday/BirthdayInvitationTemplate";
-import SinhalaBirthdayTemplate from "../components/assets/birthday/SinhalaBirthdayTemplate";
-import OfficeInvitationTemplate from "../components/assets/office/OfficeInvitationTemplate";
-import SinhalaOfficeInvitationTemplate from "../components/assets/office/SinhalaOfficeInvitationTemplate";
+import KasunNethmiExactWeddingTemplate from "../components/assets/wedding/KasunNethmiExactWeddingTemplate";
+import SinhalaWeddingInvitationTemplate from "../components/assets/wedding/SinhalaWeddingInvitationTemplate";
+import EnglishBirthdayInvitationTemplate from "../components/assets/birthday/EnglishBirthdayInvitationTemplate";
+import SinhalaBirthdayInvitationTemplate from "../components/assets/birthday/SinhalaBirthdayInvitationTemplate";
+import EnglishCorporateGalaInvitationTemplate from "../components/assets/office/EnglishCorporateGalaInvitationTemplate";
+import SinhalaCorporateGalaInvitationTemplate from "../components/assets/office/SinhalaCorporateGalaInvitationTemplate";
 
 import {
   formatInvitationDate,
@@ -120,120 +116,85 @@ export function InvitationPage(): React.ReactElement {
     template,
   } = data;
 
-  const category = template?.design_schema?.category ?? "Wedding";
-  const templateName = template?.name ?? "";
   const eventName = event.event_name;
   const guestName = participant.guest_name;
   const brideName = localizedFieldData.bride_name ?? "Bride";
   const groomName = localizedFieldData.groom_name ?? "Groom";
   const birthdayPerson = localizedFieldData.birthday_person_name ?? localizedFieldData.birthday_person ?? "Birthday Star";
-  const companyName = localizedFieldData.company_name ?? event.company_name ?? "Company";
-  const locationValue =
-    event.location ||
-    event.address ||
-    localizedFieldData.event_location ||
-    localizedFieldData.location ||
-    localizedFieldData.from_location ||
-    localizedFieldData.venue ||
-    localizedFieldData.address ||
-    "";
+  const companyName = localizedFieldData.company_name ?? "Company";
+  const isKasunNethmiTemplate = template?.name === "Kasun & Nethmi Wedding";
+  const isSinhalaWeddingTemplate = template?.name === "Sinhala Wedding";
+  const isSinhalaBirthdayTemplate = template?.name === "Sinhala Birthday";
+  const isEnglishBirthdayTemplate = template?.name === "English Birthday";
+  const isEnglishOfficeTemplate = template?.name === "English Office";
+  const isSinhalaOfficeTemplate = template?.name === "Sinhala Office";
 
-  const renderInvitationCard = (): React.ReactElement => {
-    if (templateName === "English Wedding" || (category === "Wedding" && language === "en")) {
-      return (
-        <WeddingInvitationTemplate
-          eventName={eventName}
-          location={locationValue}
-          date={event.event_date}
-          category="Wedding"
-          language="en"
-        />
-      );
-    }
+  const customInvitation = isKasunNethmiTemplate ? (
+    <KasunNethmiExactWeddingTemplate
+      guestName={guestName}
+      eventName={eventName}
+      brideName={brideName}
+      groomName={groomName}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+      language={language}
+    />
+  ) : isSinhalaWeddingTemplate ? (
+    <SinhalaWeddingInvitationTemplate
+      eventName={eventName}
+      brideName={brideName}
+      groomName={groomName}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+      category="මංගල ආරාධනා පත්‍රය"
+    />
+  ) : isSinhalaBirthdayTemplate ? (
+    <SinhalaBirthdayInvitationTemplate
+      eventName={eventName}
+      birthdayPerson={birthdayPerson}
+      age={localizedFieldData.age}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+      category="විශේෂ ආරාධනාවයි"
+    />
+  ) : isEnglishBirthdayTemplate ? (
+    <EnglishBirthdayInvitationTemplate
+      eventName={eventName}
+      birthdayPerson={birthdayPerson}
+      age={localizedFieldData.age}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+      category="Special Invitation"
+    />
+  ) : isEnglishOfficeTemplate ? (
+    <EnglishCorporateGalaInvitationTemplate
+      eventName={eventName}
+      companyName={companyName}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+    />
+  ) : isSinhalaOfficeTemplate ? (
+    <SinhalaCorporateGalaInvitationTemplate
+      eventName={eventName}
+      companyName={companyName}
+      date={event.event_date}
+      time={event.event_date}
+      location={event.location}
+    />
+  ) : null;
 
-    if (templateName === "Sinhala Wedding" || (category === "Wedding" && language === "si")) {
-      return (
-        <SinhalaWeddingTemplate
-          eventName={eventName}
-          location={locationValue}
-          date={event.event_date}
-          category="Wedding"
-          language="si"
-        />
-      );
-    }
-
-    if (templateName === "English Birthday" || (category === "Birthday" && language === "en")) {
-      return (
-        <BirthdayInvitationTemplate
-          guestName={guestName}
-          eventName={eventName}
-          date={event.event_date}
-          location={locationValue}
-          category="Birthday"
-          language="en"
-        />
-      );
-    }
-
-    if (templateName === "Sinhala Birthday" || (category === "Birthday" && language === "si")) {
-      return (
-        <SinhalaBirthdayTemplate
-          guestName={guestName}
-          eventName={eventName}
-          date={event.event_date}
-          location={locationValue}
-          category="Birthday"
-          language="si"
-        />
-      );
-    }
-
-    if (templateName === "English Office" || (category === "Office" && language === "en")) {
-      return (
-        <OfficeInvitationTemplate
-          guestName={guestName}
-          eventName={eventName}
-          companyName={companyName}
-          date={event.event_date}
-          location={locationValue}
-          category="Office"
-          language="en"
-        />
-      );
-    }
-
-    if (templateName === "Sinhala Office" || (category === "Office" && language === "si")) {
-      return (
-        <SinhalaOfficeInvitationTemplate
-          guestName={guestName}
-          eventName={eventName}
-          companyName={companyName}
-          date={event.event_date}
-          location={locationValue}
-          category="Office"
-          language="si"
-        />
-      );
-    }
-
-    return (
-      <TemplateRenderer
-        designSchema={template.design_schema}
-        fieldData={localizedFieldData}
-        language={language}
-      />
-    );
-  };
-
-  const invitationCard = renderInvitationCard();
-
-  const OpeningAnimation =
-    category === "Birthday"
-      ? BirthdayInvitation
-      : category === "Office"
-        ? OfficeInvitation
-        : WeddingInvitation;
+  const invitationCard = customInvitation ?? (
+    <TemplateRenderer
+      designSchema={template.design_schema}
+      fieldData={localizedFieldData}
+      language={language}
+    />
+  );
 
   const hasAlreadyResponded = responded || participant.rsvp_status !== "pending";
 
@@ -256,19 +217,7 @@ export function InvitationPage(): React.ReactElement {
 
       <main className="flex flex-1 flex-col items-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-sm">
-          <OpeningAnimation
-            guestName={guestName}
-            eventName={eventName}
-            companyName={companyName}
-            date={event.event_date}
-            time={event.event_date}
-            location={event.location}
-            brideName={brideName}
-            groomName={groomName}
-            birthdayPerson={birthdayPerson}
-          >
-            {invitationCard}
-          </OpeningAnimation>
+          {invitationCard}
         </div>
 
         <div className="mt-8 text-center">

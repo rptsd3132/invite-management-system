@@ -15,12 +15,12 @@ import { TemplateRenderer } from "../components/ui/TemplateRenderer";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 
-import WeddingInvitationTemplate from "../components/assets/wedding/WeddingInvitationTemplate";
-import SinhalaWeddingTemplate from "../components/assets/wedding/SinhalaWeddingTemplate";
-import BirthdayInvitationTemplate from "../components/assets/birthday/BirthdayInvitationTemplate";
-import SinhalaBirthdayTemplate from "../components/assets/birthday/SinhalaBirthdayTemplate";
-import OfficeInvitationTemplate from "../components/assets/office/OfficeInvitationTemplate";
-import SinhalaOfficeInvitationTemplate from "../components/assets/office/SinhalaOfficeInvitationTemplate";
+import KasunNethmiExactWeddingTemplate from "../components/assets/wedding/KasunNethmiExactWeddingTemplate";
+import SinhalaWeddingInvitationTemplate from "../components/assets/wedding/SinhalaWeddingInvitationTemplate";
+import EnglishBirthdayInvitationTemplate from "../components/assets/birthday/EnglishBirthdayInvitationTemplate";
+import SinhalaBirthdayInvitationTemplate from "../components/assets/birthday/SinhalaBirthdayInvitationTemplate";
+import EnglishCorporateGalaInvitationTemplate from "../components/assets/office/EnglishCorporateGalaInvitationTemplate";
+import SinhalaCorporateGalaInvitationTemplate from "../components/assets/office/SinhalaCorporateGalaInvitationTemplate";
 
 import type { Template } from "../types";
 
@@ -398,59 +398,59 @@ export function TemplateDetail(): React.ReactElement {
                   sm:p-4
                 "
               >
-                {template.name === "English Wedding" ? (
-                  <WeddingInvitationTemplate
-                    eventName="Sarah & Michael"
-                    location="The Grand Wedding Garden"
+                {template.name === "Kasun & Nethmi Wedding" ? (
+                  <KasunNethmiExactWeddingTemplate
+                    groomName="Kasun"
+                    brideName="Nethmi"
+                    location="The Grand Ballroom, Colombo"
                     date="2026-10-15T18:00:00"
-                    category="Wedding"
-                    language="en"
+                    compact
                   />
                 ) : template.name === "Sinhala Wedding" ? (
-                  <SinhalaWeddingTemplate
-                    eventName="කසුන් සහ නිමාලි"
-                    location="ග්‍රෑන්ඩ් වෙඩින් හෝටලය"
+                  <SinhalaWeddingInvitationTemplate
+                    eventName="කසුන් සහ නෙත්මි"
+                    location="කොළඹ, ශ්‍රී ලංකාව"
                     date="2026-10-15T18:00:00"
-                    category="Wedding"
-                    language="si"
+                    category="මංගල ආරාධනා පත්‍රය"
+                    compact
                   />
                 ) : template.name === "English Birthday" ? (
-                  <BirthdayInvitationTemplate
+                  <EnglishBirthdayInvitationTemplate
                     eventName="Lucas's Birthday Celebration"
                     guestName="Lucas"
                     date="2026-09-20T15:00:00"
                     location="Skyline Celebration Hall"
                     category="Birthday"
-                    language="en"
+                    compact
                   />
                 ) : template.name === "Sinhala Birthday" ? (
-                  <SinhalaBirthdayTemplate
+                  <SinhalaBirthdayInvitationTemplate
                     eventName="විශේෂ උපන් දින සැමරුම"
                     guestName="නෙත්මි"
                     date="2026-09-20T15:00:00"
                     location="කොළඹ"
                     category="Birthday"
-                    language="si"
+                    compact
                   />
                 ) : template.name === "English Office" ? (
-                  <OfficeInvitationTemplate
+                  <EnglishCorporateGalaInvitationTemplate
                     eventName="Future Innovation Summit"
                     companyName="Nexus Technologies"
                     guestName="Alex"
                     location="Grand Conference Hall"
                     date="2026-12-05T19:30:00"
                     category="Office"
-                    language="en"
+                    compact
                   />
                 ) : template.name === "Sinhala Office" ? (
-                  <SinhalaOfficeInvitationTemplate
+                  <SinhalaCorporateGalaInvitationTemplate
                     eventName="නවෝත්පාදන හා තාක්ෂණ සමුළුව"
                     companyName="Nexus Technologies"
                     guestName="අලෙක්ස්"
                     location="කොළඹ සම්මන්ත්‍රණ ශාලාව"
                     date="2026-12-05T19:30:00"
                     category="Office"
-                    language="si"
+                    compact
                   />
                 ) : (
                   <TemplateRenderer

@@ -114,6 +114,21 @@ export function TemplateCard({
               </span>
             </div>
           </div>
+        ) : category === "Wedding" || category === "Birthday" || category === "Office" ? (
+          <div className="flex h-full flex-col items-center justify-center bg-[#FAF7F0] px-5 text-center">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#8B6F3E]">
+              {category} Invitation
+            </span>
+            <span className="mt-5 font-serif text-3xl text-[#D4AF37]">
+              {category === "Birthday"
+                ? templateName?.includes("Sinhala") ? "කසුන්ගේ උපන්දිනය" : "Birthday Celebration"
+                : templateName?.includes("Sinhala") ? "කසුන් සහ නෙත්මි" : "Kasun & Nethmi"}
+            </span>
+            <span className="mt-5 h-px w-20 bg-[#D4AF37]/50" />
+            <span className="mt-4 text-xs italic text-[#8B6F3E]">
+              {category === "Birthday" ? "A special celebration awaits" : "A beautiful moment awaits"}
+            </span>
+          </div>
         ) : imageSource ? (
           <img
             src={imageSource}

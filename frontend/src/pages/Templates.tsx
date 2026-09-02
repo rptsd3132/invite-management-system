@@ -7,14 +7,14 @@ import { getTemplates } from "../lib/api";
 import { Button } from "../components/ui/Button";
 import { cn } from "../lib/utils";
 
-import WeddingInvitationTemplate from "../components/assets/wedding/WeddingInvitationTemplate";
-import SinhalaWeddingTemplate from "../components/assets/wedding/SinhalaWeddingTemplate";
+import KasunNethmiExactWeddingTemplate from "../components/assets/wedding/KasunNethmiExactWeddingTemplate";
+import SinhalaWeddingInvitationTemplate from "../components/assets/wedding/SinhalaWeddingInvitationTemplate";
 
-import BirthdayInvitationTemplate from "../components/assets/birthday/BirthdayInvitationTemplate";
-import SinhalaBirthdayTemplate from "../components/assets/birthday/SinhalaBirthdayTemplate";
+import EnglishBirthdayInvitationTemplate from "../components/assets/birthday/EnglishBirthdayInvitationTemplate";
+import SinhalaBirthdayInvitationTemplate from "../components/assets/birthday/SinhalaBirthdayInvitationTemplate";
 
-import OfficeInvitationTemplate from "../components/assets/office/OfficeInvitationTemplate";
-import SinhalaOfficeInvitationTemplate from "../components/assets/office/SinhalaOfficeInvitationTemplate";
+import EnglishCorporateGalaInvitationTemplate from "../components/assets/office/EnglishCorporateGalaInvitationTemplate";
+import SinhalaCorporateGalaInvitationTemplate from "../components/assets/office/SinhalaCorporateGalaInvitationTemplate";
 
 const FILTER_CATEGORIES = [
   "All",
@@ -24,10 +24,10 @@ const FILTER_CATEGORIES = [
 ] as const;
 
 /*
- * ONLY THESE SIX TEMPLATES ARE ALLOWED
+ * ACTIVE TEMPLATES
  */
 const ACTIVE_TEMPLATE_NAMES = new Set([
-  "English Wedding",
+  "Kasun & Nethmi Wedding",
   "Sinhala Wedding",
   "English Birthday",
   "Sinhala Birthday",
@@ -44,33 +44,36 @@ function TemplatePreview({
 }: TemplatePreviewProps): React.ReactElement {
   const commonDate = "2026-10-15T18:00:00";
 
-  if (templateName === "English Wedding") {
+  if (templateName === "Kasun & Nethmi Wedding") {
     return (
-      <WeddingInvitationTemplate
-        eventName="Sarah & Michael"
-        location="The Grand Wedding Garden"
+      <KasunNethmiExactWeddingTemplate
+        groomName="Kasun"
+        brideName="Nethmi"
+        location="The Grand Ballroom, Colombo"
         date={commonDate}
         category="Wedding"
         language="en"
+        compact
       />
     );
   }
 
   if (templateName === "Sinhala Wedding") {
     return (
-      <SinhalaWeddingTemplate
-        eventName="කසුන් සහ නිමාලි"
-        location="ග්‍රෑන්ඩ් වෙඩින් හෝටලය"
+      <SinhalaWeddingInvitationTemplate
+        groomName="කසුන්"
+        brideName="නෙත්මි"
+        location="කොළඹ, ශ්‍රී ලංකාව"
         date={commonDate}
-        category="Wedding"
-        language="si"
+        category="මංගල ආරාධනා පත්‍රය"
+        compact
       />
     );
   }
 
   if (templateName === "English Birthday") {
     return (
-      <BirthdayInvitationTemplate
+      <EnglishBirthdayInvitationTemplate
         eventName="Lucas's Birthday Celebration"
         birthdayPerson="Lucas"
         age="10"
@@ -78,13 +81,14 @@ function TemplatePreview({
         date="2026-09-20T15:00:00"
         category="Birthday"
         language="en"
+        compact
       />
     );
   }
 
   if (templateName === "Sinhala Birthday") {
     return (
-      <SinhalaBirthdayTemplate
+      <SinhalaBirthdayInvitationTemplate
         eventName="විශේෂ උපන් දින සැමරුම"
         birthdayPerson="නෙත්මි"
         age="21"
@@ -92,13 +96,14 @@ function TemplatePreview({
         date="2026-09-20T15:00:00"
         category="Birthday"
         language="si"
+        compact
       />
     );
   }
 
   if (templateName === "English Office") {
     return (
-      <OfficeInvitationTemplate
+      <EnglishCorporateGalaInvitationTemplate
         eventName="Future Innovation Summit"
         companyName="Nexus Technologies"
         location="Grand Conference Hall"
@@ -111,7 +116,7 @@ function TemplatePreview({
 
   if (templateName === "Sinhala Office") {
     return (
-      <SinhalaOfficeInvitationTemplate
+      <SinhalaCorporateGalaInvitationTemplate
         eventName="නවෝත්පාදන හා තාක්ෂණ සමුළුව"
         companyName="Nexus Technologies"
         location="කොළඹ සම්මන්ත්‍රණ ශාලාව"
