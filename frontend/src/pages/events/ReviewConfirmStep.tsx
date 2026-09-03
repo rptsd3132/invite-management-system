@@ -5,6 +5,12 @@ import { CheckCircle, Loader2 } from "lucide-react";
 import { createEvent, addParticipants } from "../../lib/api";
 import { resetEventState } from "../../store/useEventStore";
 import { TemplateRenderer } from "../../components/ui/TemplateRenderer";
+import KasunNethmiExactWeddingTemplate from "../../components/assets/wedding/KasunNethmiExactWeddingTemplate";
+import SinhalaWeddingInvitationTemplate from "../../components/assets/wedding/SinhalaWeddingInvitationTemplate";
+import EnglishBirthdayInvitationTemplate from "../../components/assets/birthday/EnglishBirthdayInvitationTemplate";
+import SinhalaBirthdayInvitationTemplate from "../../components/assets/birthday/SinhalaBirthdayInvitationTemplate";
+import EnglishCorporateGalaInvitationTemplate from "../../components/assets/office/EnglishCorporateGalaInvitationTemplate";
+import SinhalaCorporateGalaInvitationTemplate from "../../components/assets/office/SinhalaCorporateGalaInvitationTemplate";
 import { Button } from "../../components/ui/Button";
 import { useAllTemplates } from "../../hooks/useAllTemplates";
 import {
@@ -78,6 +84,115 @@ export function ReviewConfirmStep({ state, goToStep }: Props): React.ReactElemen
     state.guests,
     template,
   ]);
+
+  const renderInvitationPreview = (): React.ReactElement => {
+    if (!template) {
+      return <></>;
+    }
+
+    const eventName = state.eventData.eventName || "Your Event";
+    const location = state.eventData.location || "Event Location";
+    const eventDate = state.eventData.eventDate || new Date().toISOString();
+    const metadata = state.eventData.metadata ?? {};
+    const templateName = template.name;
+    const birthdayPerson =
+      metadata.birthday_person_name || metadata.birthday_person || "Birthday Star";
+    const companyName = metadata.company_name || metadata.host_name || "";
+
+    if (templateName === "Kasun & Nethmi Wedding") {
+      return (
+        <KasunNethmiExactWeddingTemplate
+          eventName={eventName}
+          groomName={metadata.groom_name || "Groom"}
+          brideName={metadata.bride_name || "Bride"}
+          location={location}
+          date={eventDate}
+          category="Wedding"
+          language="en"
+          compact
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Wedding") {
+      return (
+        <SinhalaWeddingInvitationTemplate
+          eventName={eventName}
+          groomName={metadata.groom_name || "Groom"}
+          brideName={metadata.bride_name || "Bride"}
+          location={location}
+          date={eventDate}
+          category="මංගල ආරාධනා පත්‍රය"
+          compact
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Birthday") {
+      return (
+        <SinhalaBirthdayInvitationTemplate
+          eventName={eventName}
+          birthdayPerson={birthdayPerson}
+          age={metadata.age || ""}
+          location={location}
+          date={eventDate}
+          category="Birthday"
+          language="si"
+          compact
+        />
+      );
+    }
+
+    if (templateName === "English Birthday") {
+      return (
+        <EnglishBirthdayInvitationTemplate
+          eventName={eventName}
+          birthdayPerson={birthdayPerson}
+          age={metadata.age || ""}
+          location={location}
+          date={eventDate}
+          category="Birthday"
+          language="en"
+          compact
+        />
+      );
+    }
+
+    if (templateName === "Sinhala Office") {
+      return (
+        <SinhalaCorporateGalaInvitationTemplate
+          eventName={eventName}
+          companyName={companyName}
+          location={location}
+          date={eventDate}
+          category="Office"
+          language="si"
+        />
+      );
+    }
+
+    if (templateName === "English Office") {
+      return (
+        <EnglishCorporateGalaInvitationTemplate
+          eventName={eventName}
+          companyName={companyName}
+          location={location}
+          date={eventDate}
+          category="Office"
+          language="en"
+          compact
+        />
+      );
+    }
+
+    return (
+      <TemplateRenderer
+        designSchema={template.design_schema}
+        fieldData={previewFieldData}
+        language={language}
+      />
+    );
+  };
 
   const mutation = useMutation({
     mutationFn: async (): Promise<{ event: EventResponse; participants: ParticipantResponse[] }> => {
@@ -211,11 +326,7 @@ export function ReviewConfirmStep({ state, goToStep }: Props): React.ReactElemen
         <div className="flex justify-center">
           <div className="w-full max-w-sm">
             <p className="mb-3 text-sm font-medium text-zinc-700">Invitation Preview</p>
-            <TemplateRenderer
-              designSchema={template.design_schema}
-              fieldData={previewFieldData}
-              language={language}
-            />
+            {renderInvitationPreview()}
           </div>
         </div>
       </div>
